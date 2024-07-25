@@ -1,0 +1,19 @@
+services:
+  mongodb:
+    image: mongo:latest
+    restart: no
+    ports:
+      - 27017:27017
+    tmpfs:
+      - /data/db:size=512M,mode=1700
+  mongodb-auth:
+    image: mongo:latest
+    restart: no
+    environment:
+      MONGO_INITDB_DATABASE: db
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: secret
+    ports:
+      - 27016:27016
+    tmpfs:
+      - /data/db:size=512M,mode=1700

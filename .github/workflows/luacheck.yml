@@ -1,0 +1,16 @@
+name: luacheck
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.lua'
+  workflow_dispatch:
+jobs:
+  luacheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Luacheck
+        uses: lunarmodules/luacheck@v1

@@ -1,0 +1,25 @@
+describe("caveats", function()
+  local t, is, mongo, meta
+  setup(function()
+    t = require "t"
+    is = t.is
+    meta = require "meta"
+    mongo = t.db.mongo
+  end)
+  it("__mul", function()
+    local c = mongo.collection
+    _ = c('mongodb://srvdb1') * c('mongodb://srvdb2') * c('mongodb://srvdb3')
+  end)
+  it("__pow", function()
+    local c = mongo.collection
+    _ = c('mongodb://srvdb1') ^ c('mongodb://srvdb2') ^ c('mongodb://srvdb3')
+  end)
+--  it("__newindex", function()
+--    local c = mongo.collection    
+--    _ = c('mongodb://srvdb1') * c('mongodb://srvdb2') * c('mongodb://srvdb3')
+--  end)
+--  it("__lt", function()
+--    local c = mongo.collection
+--    c('mongodb://srvdb1') < c('mongodb://srvdb2') < c('mongodb://srvdb3')
+--  end)
+end)

@@ -1,0 +1,32 @@
+name: test
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        luaVersion: ["5.1", "5.2", "5.3", "luajit", "luajit-openresty"]
+    env:
+      ROCKSPEC: ${{ github.event.repository.name }}-scm-0.rockspec
+    steps:
+    - uses: actions/checkout@master
+    - uses: leafo/gh-actions-lua@v10
+      with:
+        luaVersion: ${{ matrix.luaVersion }}
+    - uses: leafo/gh-actions-luarocks@v4
+    - name: test deps
+      run: luarocks test --prepare
+    - name: dependencies
+      run: |
+        luarocks install --deps-mode all --only-deps --dev ${{ env.ROCKSPEC }}
+    - name: build
+      run: luarocks build --deps-mode all ${{ env.ROCKSPEC }}
+    - name: busted
+      run: luarocks test -- -o TAP
