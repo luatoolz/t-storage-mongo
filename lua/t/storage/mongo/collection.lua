@@ -36,7 +36,7 @@ return setmetatable({}, {
     return setmetatable({__ = ctx}, getmetatable(self)) ^ k
   end,
   __name='t/storage/mongo/collection',
-  __tostring = function(self) end,
+  __tostring = function(self) return self.__ and tostring(self.__) or 't/storage/mongo/collection' end,
   __toboolean=function(self) return tonumber(self)>0 end,
   __tonumber = function(self) return (self and self.__ and self.__.coll) and self.__.coll:count({}) or 0 end,
   __pow = function(self, o)
