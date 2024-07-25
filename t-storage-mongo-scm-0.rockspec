@@ -27,6 +27,7 @@ dependencies = {
 
 test_dependencies = {
   "busted",
+  "inspect",
 }
 
 test = {
