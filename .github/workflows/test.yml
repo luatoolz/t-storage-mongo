@@ -24,7 +24,7 @@ jobs:
     - name: test deps
       run: luarocks test --prepare
     - name: system dependencies
-      run: apt update -y && apt install -y libmongoc-dev
+      run: sudo apt update -y && sudo apt install -y libmongoc-dev
     - name: dependencies
       run: luarocks install --deps-mode all --only-deps --dev ${{ env.ROCKSPEC }}
     - name: build
