@@ -2,6 +2,8 @@ describe("client", function()
   local t, is, mongo
   setup(function()
     t = require "t"
+    require "t.storage.mongo.connection"
+    t.env.MONGO_HOST='127.0.0.1'
     is = t.is
     mongo = t.storage.mongo
   end)
