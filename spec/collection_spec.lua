@@ -2,6 +2,7 @@ describe("collection", function()
   local t, is, mongo, iter, coll
   setup(function()
     t = require "t"
+    t.env.MONGO_HOST='127.0.0.1'
     is = t.is
     mongo = t.storage.mongo
     iter = mongo.iter
