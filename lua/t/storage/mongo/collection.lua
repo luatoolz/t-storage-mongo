@@ -84,9 +84,12 @@ return setmetatable({}, {
 
     -- multi records
     if id=='' or id=='*' then query={} end
-    if is.table_no_id(id) or is.table_empty(id) then query = id end
-    if is.json_object(id) then query = json.decode(id) end
-    if query then return records(self, query) end
+    if (not query) and is.table_no_id(id) or is.table_empty(id) then query = id end
+    if (not query) and is.json_object(id) then query = json.decode(id) end
+    if query then
+      assert(t.type(self) == 't/storage/mongo/collection', string.format('collection.__index: require %s, got %s', 't/storage/mongo/collection', t.type(self)))
+      return records(self, query)
+    end
     -- TODO: check PRIMARY, UNIQ, INDEX KEYS from object definition
     return nil
   end,
