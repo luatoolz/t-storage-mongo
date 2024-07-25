@@ -110,8 +110,11 @@ describe("collection", function()
     assert.same(a, b)
     assert.same(a, c)
 
---    assert.same(table.map(coll['']), table.map(coll[{}]))
---    assert.same(table.map(coll['*']), table.map(coll[{}]))
+    assert.same(table.map(coll['']), table.map(coll[{}]))
+    assert.same(table.map(coll['*']), table.map(coll[{}]))
+
+    assert.equal(coll[''], coll[{}])
+    assert.equal(coll['*'], coll[{}])
   end)
   it("empty", function()
     assert.equal('t/storage/mongo/collection', t.type(coll))

@@ -21,6 +21,5 @@ return setmetatable({}, {
     return function() local rv=it(); if rv then i=i+1; return i,rv end; return nil, nil; end
   end,
   __index=function(self, k) return type(k)=='number' and table.map(iter(self))[k] or rawget(self, k) end,
-  __eq = function(self, to) return is.eq(table.map(self), table.map(to)) end,
---  __eq=function(self, to) return type(self)=='table' and type(to)=='table' and type(self.coll)~='nil' and type(self.coll)==type(to.coll) and tostring(self.coll)==tostring(to.coll) and is.eq(self.query, to.query) end,
+  __eq=function(self, to) return type(self)=='table' and type(to)=='table' and type(self.coll)~='nil' and type(self.coll)==type(to.coll) and tostring(self.coll)==tostring(to.coll) and is.eq(self.query, to.query) end,
 })
