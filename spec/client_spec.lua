@@ -4,6 +4,7 @@ describe("client", function()
     t = require "t"
     require "t.storage.mongo.connection"
     t.env.MONGO_HOST='127.0.0.1'
+    t.env.MONGO_CONNSTRING=nil
     is = t.is
     mongo = t.storage.mongo
   end)
