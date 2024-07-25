@@ -2,7 +2,6 @@ local t = require "t"
 local is = t.is
 local env = t.env
 local escape = require "t.storage.mongo.escape"
-local unescape = require "t.storage.mongo.unescape"
 
 env.MONGO_PREFIX  = 'mongodb://'
 env.MONGO_HOST    = 'mongodb'
@@ -48,6 +47,7 @@ local function parse_connstring(oconnstring)
   local user = connstring:nmatch('^[^:@]*'):null()
   if user then connstring=connstring:sub(#user+1) end
   local pass=escape(connstring:lstrip(':'))
+  _ = oconnstring
   return {
     prefix=prefix,
     db=db,

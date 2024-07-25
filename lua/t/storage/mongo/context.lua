@@ -1,5 +1,4 @@
 local t = require "t"
-local driver = require 'mongo'
 
 -- context object with client, db, coll
 return t.object({

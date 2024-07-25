@@ -1,16 +1,11 @@
 describe("collection", function()
-  local t, is, mongo, meta, inspect, coll, oid, tt, driver
+  local t, is, mongo, iter, coll
   setup(function()
     t = require "t"
     is = t.is
-    meta = require "meta"
     mongo = t.storage.mongo
-    inspect = require "inspect"
     iter = mongo.iter
     coll = mongo.coll
-    oid = t.fn.combined(tostring, string.null, mongo.ObjectID)
-    tt = mongo.type
-    driver = require 'mongo'
   end)
   before_each(function()
     t.env.MONGO_CONNSTRING=nil
@@ -43,10 +38,8 @@ describe("collection", function()
     assert.is_true(toboolean(coll))
 
     local id = mongo.ObjectID('6690c3c574d428e23e0493c7')
-    local y1,y2 = {name='some', try=5}, {_id=id, name='some', try=5}
     local a,b
     coll[id] = {name='some', try=5}
-
     a=coll[id]
 
     coll[id]=nil
@@ -57,7 +50,6 @@ describe("collection", function()
     coll[id]=nil
     assert.equal(1, tonumber(coll))
 
---    assert.is_table(a)
     assert.same(a, b)
 
     assert.equal(1, tonumber(coll))
@@ -94,7 +86,6 @@ describe("collection", function()
     assert.same({{try=1},{try=2},{try=3},{try=4},}, table.map(it, function(x) x._id=nil; x.name=nil; return x end))
   end)
   it("empty", function()
-    local coll = mongo.coll
     assert.equal('t/storage/mongo/collection', t.type(coll))
 
     assert.equal(0, tonumber(coll))
@@ -112,9 +103,7 @@ describe("collection", function()
     assert.equal(0, tonumber(-coll))
   end)
   it("update", function()
-    local coll = mongo.coll
     assert.equal('t/storage/mongo/collection', t.type(coll))
-
     assert.equal(0, tonumber(-coll))
 
     local ida = '66909d26cbade70b6b022b9a'
@@ -169,7 +158,6 @@ describe("collection", function()
     assert.equal(0, tonumber(coll-id))
   end)
   it("records", function()
-    local coll = mongo.coll
     assert.equal('t/storage/mongo/collection', t.type(coll))
     assert.equal(0, tonumber(-coll))
 

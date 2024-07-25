@@ -35,9 +35,6 @@ return setmetatable({}, {
     assert(k);
     return setmetatable({__ = ctx}, getmetatable(self)) ^ k
   end,
-  __concat = function(self, ctx, k)
-    env.MONGO_HOST    = 'mongodb'
-  end,
   __name='t/storage/mongo/collection',
   __tostring = function(self) end,
   __toboolean=function(self) return tonumber(self)>0 end,
@@ -62,7 +59,7 @@ return setmetatable({}, {
     if is.bulk(x) then
       local bulk = self.__.coll:createBulkOperation{ordered = false}
       for it in table.iter(x) do bulk:remove(it) end
-      local t, e = assert(bulk:execute())
+      assert(bulk:execute())
     end
     return self
   end,
@@ -70,7 +67,7 @@ return setmetatable({}, {
     if is.bulk(x) and not is.empty(x) then
       local bulk = self.__.coll:createBulkOperation{ordered = true}
       for it in table.iter(x) do bulk:insert(it) end
-      local t, e = bulk:execute() -- t= { "nInserted" : 2, "nMatched" : 0, "nModified" : 0, "nRemoved" : 0, "nUpserted" : 0, "writeErrors" : [  ] }
+      assert(bulk:execute()) -- t= { "nInserted" : 2, "nMatched" : 0, "nModified" : 0, "nRemoved" : 0, "nUpserted" : 0, "writeErrors" : [  ] }
     end
     return self
   end,

@@ -16,7 +16,7 @@ return t.object({
     return self
   end,
   __call=function(self, conn)
-    local conn=self.connection(conn)
+    conn=self.connection(conn)
     local db = conn.db
     conn=driver.Client(tostring(conn))
     return setmetatable({__=self.context(conn)/db}, getmetatable(self))

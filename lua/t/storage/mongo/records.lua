@@ -1,5 +1,4 @@
 local t = require "t"
-local driver = require "mongo"
 local meta = require "meta"
 local require = meta.require(...)
 local iter = require ".iter"

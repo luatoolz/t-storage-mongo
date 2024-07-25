@@ -1,5 +1,5 @@
 describe("connection", function()
-  local t, is, is2, mongo, mongo2, mongo3, conn, meta, connection1, connection2
+  local t, is, is2, mongo, mongo2, mongo3, meta, connection1, connection2
   setup(function()
     t = require "t"
     is = t.is
