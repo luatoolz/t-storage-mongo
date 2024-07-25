@@ -83,7 +83,7 @@ return setmetatable({}, {
     if query then query=self.__.coll:findOne(query); return query and query:value() or query end -- record(self.__.coll:findOne(query), self)
 
     -- multi records
-    if id=='' or id=='*' then id={} end
+    if id=='' or id=='*' then query={} end
     if is.table_no_id(id) or is.table_empty(id) then query = id end
     if is.json_object(id) then query = json.decode(id) end
     if query then return records(self, query) end
