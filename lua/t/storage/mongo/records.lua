@@ -7,6 +7,7 @@ local iter = require ".iter"
 return setmetatable({}, {
   __call=function(self, coll, query)
     assert('t/storage/mongo/collection' == t.type(coll), string.format('records.__call: await %s, got %s', 't/storage/mongo/collection', t.type(coll)))
+    if query=='' or query=='*' then query={} end
     return setmetatable({__=coll.__, coll=coll, query=query or {}}, getmetatable(self))
   end,
   __toboolean=function(self) return tonumber(self)>0 end,
