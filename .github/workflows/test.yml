@@ -23,9 +23,10 @@ jobs:
     - uses: leafo/gh-actions-luarocks@v4
     - name: test deps
       run: luarocks test --prepare
+    - name: system dependencies
+      run: apt update -y && apt install -y libmongoc-dev
     - name: dependencies
-      run: |
-        luarocks install --deps-mode all --only-deps --dev ${{ env.ROCKSPEC }}
+      run: luarocks install --deps-mode all --only-deps --dev ${{ env.ROCKSPEC }}
     - name: build
       run: luarocks build --deps-mode all ${{ env.ROCKSPEC }}
     - name: busted
