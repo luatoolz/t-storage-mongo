@@ -58,6 +58,9 @@ describe("collection", function()
     assert.equal(1, tonumber(coll))
     assert.equal(false, toboolean(coll[id]))
     coll[id]=nil
+
+    assert.is_nil(coll[nil])
+
     assert.equal(0, tonumber(-coll))
   end)
   it("insert", function()
@@ -87,6 +90,27 @@ describe("collection", function()
     local it = iter(coll[{}])
     assert.is_function(it)
     assert.same({{try=1},{try=2},{try=3},{try=4},}, table.map(it, function(x) x._id=nil; x.name=nil; return x end))
+
+    it = iter(coll[{}])
+
+    local a=table.map(it)
+    assert.is_table(a)
+
+    local b=coll[{}]
+    assert.is_table(b)
+    b=table.map(b)
+    assert.is_table(b)
+
+    assert.same(a, b)
+
+    assert.equal(4, tonumber(coll[{}]))
+
+    assert.equal(4, tonumber(coll[{}]))
+    assert.equal(4, tonumber(coll['']))
+    assert.equal(4, tonumber(coll['*']))
+
+    assert.same(table.map(coll['']), table.map(coll[{}]))
+    assert.same(table.map(coll['*']), table.map(coll[{}]))
   end)
   it("empty", function()
     assert.equal('t/storage/mongo/collection', t.type(coll))

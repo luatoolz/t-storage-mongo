@@ -72,8 +72,10 @@ return setmetatable({}, {
     return self
   end,
   __index = function(self, id)
+    if type(id)=='nil' then return nil end
     if type(id)=='number' then return self[{}][id] end
     local query
+    if id=='' or id=='*' then id={} end
     if is.json_object(id) then query = json.decode(id) end
     if t.type(id) == 'mongo.ObjectID' then query = {_id = id} end
     if is.table_with_id(id) then query = {_id = id._id} end
