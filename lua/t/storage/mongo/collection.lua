@@ -111,6 +111,7 @@ return setmetatable({}, {
       if is.bulk(x) then error('error: coll.id=bulk()') end
       if is.table.unindexed(x) or getmetatable(x or {}) then
         x._id=nil
+print(' __newindex[ query, x ]', inspect(query), inspect(x))
         normalize_table(x)
         local ok, err = self.__.coll:update(query, x, {upsert = true})
         if ok~=true then
