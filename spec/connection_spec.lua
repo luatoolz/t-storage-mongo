@@ -2,6 +2,7 @@ describe("connection", function()
   local t, is, is2, mongo, mongo2, mongo3, meta, connection1, connection2
   setup(function()
     t = require "t"
+    t.env.MONGO_CONNSTRING=nil
     t.env.MONGO_HOST='mongodb'
     is = t.is
     is2 = require "t/is"

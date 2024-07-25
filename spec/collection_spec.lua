@@ -2,15 +2,16 @@ describe("collection", function()
   local t, is, mongo, iter, coll
   setup(function()
     t = require "t"
+    t.env.MONGO_CONNSTRING=nil
     require "t.storage.mongo.connection"
     t.env.MONGO_HOST='127.0.0.1'
-    t.env.MONGO_CONNSTRING=nil
     is = t.is
     mongo = t.storage.mongo
     iter = mongo.iter
     coll = mongo.coll
   end)
   before_each(function()
+    t.env.MONGO_CONNSTRING=nil
     _ = -mongo.coll
   end)
   it("type", function()
