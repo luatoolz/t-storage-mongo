@@ -12,6 +12,7 @@ describe("collection", function()
   end)
   before_each(function()
     t.env.MONGO_CONNSTRING=nil
+    coll = mongo.coll
     _ = -mongo.coll
   end)
   it("type", function()
@@ -98,9 +99,13 @@ describe("collection", function()
     assert.equal(coll[''], coll[{}])
     assert.equal(coll['*'], coll[{}])
 
-    local a=table.map(coll[{}])
-    local b=table.map(coll[''])
-    local c=table.map(coll['*'])
+    local aa=coll[{}]
+    local bb=coll['']
+    local cc=coll['*']
+
+    local a=table.map(aa)
+    local b=table.map(bb)
+    local c=table.map(cc)
 
     assert.same(a, b)
     assert.same(a, c)
