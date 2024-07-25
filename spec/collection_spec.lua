@@ -95,6 +95,9 @@ describe("collection", function()
     assert.equal(4, tonumber(coll['']))
     assert.equal(4, tonumber(coll['*']))
 
+    assert.equal(coll[''], coll[{}])
+    assert.equal(coll['*'], coll[{}])
+
     assert.same(table.map(coll['']), table.map(coll[{}]))
     assert.same(table.map(coll['*']), table.map(coll[{}]))
   end)

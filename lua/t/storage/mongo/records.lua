@@ -1,11 +1,12 @@
 local t = require "t"
+local is = t.is
 local meta = require "meta"
 local require = meta.require(...)
 local iter = require ".iter"
 
 return setmetatable({}, {
   __call=function(self, coll, query)
-    assert('t/storage/mongo/collection' == t.type(coll))
+    assert('t/storage/mongo/collection' == t.type(coll), string.format('records.__call: await %s, got %s', 't/storage/mongo/collection', t.type(coll)))
     return setmetatable({__=coll.__, coll=coll, query=query or {}}, getmetatable(self))
   end,
   __toboolean=function(self) return tonumber(self)>0 end,
@@ -19,4 +20,5 @@ return setmetatable({}, {
     return function() local rv=it(); if rv then i=i+1; return i,rv end; return nil, nil; end
   end,
   __index=function(self, k) return type(k)=='number' and table.map(iter(self))[k] or rawget(self, k) end,
+  __eq=function(self, to) return tostring(self.coll)==tostring(to.coll) and is.eq(self.query, to.query) end,
 })
