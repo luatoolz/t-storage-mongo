@@ -7,8 +7,8 @@ describe("client", function()
     is = t.is
     mongo = t.storage.mongo
   end)
-  before_each(function()
-    t.env.MONGO_CONNSTRING=nil
+  it("env", function()
+    assert.equal('127.0.0.1', t.env.MONGO_HOST)
   end)
   it("connect", function()
     assert.is_true(toboolean(mongo))
