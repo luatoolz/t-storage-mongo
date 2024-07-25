@@ -14,6 +14,7 @@ jobs:
       matrix:
         luaVersion: ["5.1", "5.2", "5.3", "luajit", "luajit-openresty"]
     env:
+      SYSDEPS: libmongoc-dev
       ROCKSPEC: ${{ github.event.repository.name }}-scm-0.rockspec
     steps:
     - uses: actions/checkout@master
@@ -24,10 +25,16 @@ jobs:
     - name: test deps
       run: luarocks test --prepare
     - name: system dependencies
-      run: sudo apt update -y && sudo apt install -y libmongoc-dev
+      run: sudo apt update -y && sudo apt install -y ${{ env.SYSDEPS }}
     - name: dependencies
       run: luarocks install --deps-mode all --only-deps --dev ${{ env.ROCKSPEC }}
     - name: build
       run: luarocks build --deps-mode all ${{ env.ROCKSPEC }}
+    - name: docker compose up
+      run: docker compose up -d --wait --wait-timeout 10 --no-log-prefix
+    - name: check logs
+      run: docker compose logs && docker compose ps
     - name: busted
       run: luarocks test -- -o TAP
+    - name: docker compose down
+      run: docker compose down --remove-orphans -v
