@@ -1,5 +1,5 @@
 # t.storage.mongo: mongodb object interface
-MongoDB object interface linkable to objects sets by collection names
+MongoDB object interface for `t` library.
 ```lua
 local t = require "t"
 local mongo = t.storage.mongo        -- IT WORKS with env defaults, alt above
@@ -55,10 +55,11 @@ Mongo connection string constructor
 - otherwise default connection is tried: `mongodb://mongodb:27017`
 
 ```lua
+local connection = t.storage.mongo.connection
 local conn = 
-  t.storage.mongo.connection('mongodb+srv://myDatabaseUser:D1fficultP%40ssw0rd@server.example.com/db') or
-  t.storage.mongo.connection({db='some', host='main.ms.com', user='unpriv', pass='SoME%%@@!!'}) or
-  t.storage.mongo.connection()
+  connection('mongodb+srv://myDatabaseUser:D1fficultP%40ssw0rd@server.example.com/db')
+  or connection({db='some', host='main.ms.com', user='unpriv', pass='SoME%%@@!!'})
+  or connection()
 
 local db = t.storage.mongo(mongo.conn) or t.storage.mongo
 ```
@@ -82,6 +83,7 @@ local db = t.storage.mongo(mongo.conn) or t.storage.mongo
 alpine:
 - `mongo-c-driver`
 - `mongo-c-driver-dev`
+
 debian:
 - `libmongoc-dev`
 
