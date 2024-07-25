@@ -8,6 +8,11 @@ services:
     tmpfs:
       - /data/db:size=512M,mode=1700
       - /tmp:size=8M,mode=1777
+    healthcheck:
+      test: ["CMD","mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 1s
+      timeout: 1s
+      retries: 10
 #  mongodb-auth:
 #    image: mongo:latest
 #    read_only: true
