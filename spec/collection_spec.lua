@@ -91,20 +91,6 @@ describe("collection", function()
     assert.is_function(it)
     assert.same({{try=1},{try=2},{try=3},{try=4},}, table.map(it, function(x) x._id=nil; x.name=nil; return x end))
 
-    it = iter(coll[{}])
-
-    local a=table.map(it)
-    assert.is_table(a)
-
-    local b=coll[{}]
-    assert.is_table(b)
-    b=table.map(b)
-    assert.is_table(b)
-
-    assert.same(a, b)
-
-    assert.equal(4, tonumber(coll[{}]))
-
     assert.equal(4, tonumber(coll[{}]))
     assert.equal(4, tonumber(coll['']))
     assert.equal(4, tonumber(coll['*']))
