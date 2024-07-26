@@ -1,5 +1,5 @@
 stds.t = {
-  globals = {"math", "string", "table", "toboolean"},
+  globals = {"math", "string", "table", "package", "toboolean", "tointeger", "pack", "unpack", "ngx"},
 }
 ignore = {
   "212/%.%.%.",
@@ -8,6 +8,8 @@ ignore = {
   "211/t",
   "212/_",
   "213/_",
+  "542",
+  "581",
 }
 std = "min+t"
 files["spec"] = {std = "+busted"}

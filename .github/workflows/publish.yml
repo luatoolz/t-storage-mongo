@@ -9,18 +9,16 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    env:
-      ROCKSPEC: ${{ github.event.repository.name }}-scm-0.rockspec
     steps:
     - uses: actions/checkout@master
     - uses: leafo/gh-actions-lua@v10
       with:
         luaVersion: "5.1"
     - uses: leafo/gh-actions-luarocks@v4
+    - name: install upload deps
+      run: luarocks install lua-cjson && luarocks install luasec
     - name: publish
-      run: |
-        luarocks install lua-cjson
-        luarocks install luasec
-        luarocks upload --force --api-key=${{ env.LUAROCKS_API_KEY }} ${{ env.ROCKSPEC }}
       env:
+        ROCKSPEC: ${{ github.event.repository.name }}-scm-0.rockspec
         LUAROCKS_API_KEY: ${{ secrets.LUAROCKS_API_KEY }}
+      run: luarocks upload --force --api-key=${{ env.LUAROCKS_API_KEY }} ${{ env.ROCKSPEC }}
