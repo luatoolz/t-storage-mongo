@@ -14,14 +14,14 @@ local coll = mongo['coll']                -- get collection from default mongo c
 coll = db.coll                            -- or get collection from specific db
 
 -- single record:
-local r = mongo.coll.id                   -- single record by id or unique fields defined for object
+local r = mongo.coll.id                   -- single record by id / object index fields
 print(r.field)                            -- print object field
 print(r:method(true))                     -- call object method
-_ = coll - r                              -- delete object record (_id or indexed field is used)
+_ = coll - r                              -- delete object record (by _id / index field)
 
 _ = coll + r1 + r2 + ...                  -- save objects (oid auto created)
 _ = coll .. {r1, r2, ...}                 -- save objects using __concat
-coll[nil] = r                             -- save using __newindex (single object or bulk assign)
+coll[nil] = r                             -- save using __newindex (single object / bulk)
 
 coll.id = {a=7, b=88}                     -- save new / update existing (oid specified)
 coll[{_id=XY, ...}] = {a=8}               -- same
