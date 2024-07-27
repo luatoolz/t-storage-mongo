@@ -2,43 +2,44 @@
 MongoDB object interface for `t` library.
 ```lua
 local t = require "t"
-local mongo = t.storage.mongo        -- IT WORKS with env defaults, alt above
-local db = mongo / 'dbname'     -- db selection
+local c = 'mongodb://srv:27017/secret'    -- standard mongodb connstring format
+local conn = t.storage.mongo(c)           -- use specific connection
+      or t.storage.mongo                  -- or use t.env defaults
+local mongo = mongo/'other'               -- change db
 
-mongo ^ t.any.objects.loader    -- link current db with loader, coll == object name
-mongo ^ {l1, l2, l3}            -- accept multiple loaders
+mongo ^ t.pluggable.objects               -- link mongo storage with pluggable objects by name
+mongo ^ {t.objects, {'any', 'name'}}      -- explicit linking
 
-local coll = mongo['coll']      -- get collection (auto typed after linking) using default db
-coll = db.coll                  -- or use specific db
+local coll = mongo['coll']                -- get collection from default mongo connection db
+coll = db.coll                            -- or get collection from specific db
 
 -- single record:
-local r = mongo.coll.id         -- single record by id or unique fields defined for object
+local r = mongo.coll.id                   -- single record by id or unique fields defined for object
+print(r.field)                            -- print object field
+print(r:method(true))                     -- call object method
+_ = coll - r                              -- delete object record (_id or indexed field is used)
 
-print(r.field)                  -- print record field
-print(r:method(true))           -- call some object method
--r                              -- delete record
+_ = coll + r1 + r2 + ...                  -- save objects (oid auto created)
+_ = coll .. {r1, r2, ...}                 -- save objects using __concat
+coll[nil] = r                             -- save using __newindex (single object or bulk assign)
 
-_ = coll + r1 + r2 + ...        -- save objects (oid auto created)
-coll[nil] = r                   -- same with __newindex
-
-coll.id = r                     -- save (oid specified)
-coll[r] = r                     -- similar
-
-coll[r]={...}                   -- update
+coll.id = {a=7, b=88}                     -- save new / update existing (oid specified)
+coll[{_id=XY, ...}] = {a=8}               -- same
+coll[id1] = {_id=id2, a=7, b=88}          -- different _id on the assigned object is zeroed
 
 -- multiple records:
-coll % {...}                    -- count query
-coll - {...}                    -- remove(query) or bulk remove array items
+coll % {name='masha'}                     -- count query
+coll - {_id=X, a=9, ...}                  -- remove object by id/query
+coll - {'_id1...', '_id2...', ...}        -- remove bulk items
 
-local rr = coll[{...}]          -- typed array of linked objects
-print(#rr)                      -- print records array len 
+local rr = coll[{age=33}]                 -- __iter'atable records
+print(tonumber(rr))                       -- records len 
+-rr                                       -- delete records
 
-_ = coll .. arr1 .. arr2        -- save objects (t.array of objects)
+rr % t.matcher.valid                      -- filter by matcher callable
+rr * t.fn.queue_send                      -- map/foreach
 
--rr                             -- delete array
-
-rr % t.matcher.valid            -- filter by matcher callable
-rr * t.fn.queue_send            -- map/foreach
+for k,v in pairs(coll[{}]) do ...         -- iterate pairs: _id + object
 ```
 
 ## t.storage.mongo.connection
@@ -52,7 +53,7 @@ Mongo connection string constructor
   - fields: `prefix`, `db`, `hosts`, `host`, `port`, `user`, `pass`, `options`, `connstring`
   - same fields are computed by `t.storage.mongo.connection` internally
   - fields mapped with env vars, list above
-- otherwise default connection is tried: `mongodb://mongodb:27017`
+- default connstring: `mongodb://mongodb:27017`
 
 ```lua
 local connection = t.storage.mongo.connection
