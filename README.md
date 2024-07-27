@@ -16,36 +16,40 @@ coll = db.coll                          -- or get collection from specific db
 
 local oid = mongo.ObjectID              -- this is mongo.ObjectID from lua-mongo
 local _id = oid()                       -- generate random oid
-_id = oid('6690c3c574d428e23e0493c7')   -- use existing
+_id = oid('6690c3c574d428e23e0493c7')   -- use existing oid
 
-print(tostring(_id))                    -- __tostring
 _id == oid('6690c3c574d428e23e0493c7')  -- __eq
+tostring(_id)                           -- __tostring
 
 -- single record:
 local r = mongo.coll[_id]               -- single record by _id / linked object index field
 print(r.field)                          -- print object field
 print(r:method(true))                   -- call object method
-_ = coll - {_id='XX', a=7}              -- delete object record (by _id / index field)
+coll - {_id='XX', a=7}                  -- delete object record (by _id / index field)
 
-_ = coll + r1 + r2 + ...                -- save objects (oid auto created)
-_ = coll .. {r1, r2, ...}               -- save objects using __concat
 coll[nil] = {{a='x', b='y'}, {q=19}}    -- save using __newindex (single object / bulk)
+coll + r1 + r2 + ...                    -- save objects (oid auto created)
+coll .. {r1, r2, ...}                   -- save objects using __concat
+coll + '[1,2,3,4,5]'                    -- json bulk assign
 
 coll.id = {a=7, b=88}                   -- save new / update existing (oid specified)
 coll[{_id=XY, ...}] = {a=8}             -- same
 coll[id1] = {_id=id2, a=7, b=88}        -- different _id on the assigned object is zeroed
+coll[_id] = '{"name":"Ann", "age":33}'  -- json object assign
 
 -- multiple records:
-coll % {name='masha'}                   -- count query
+coll % {name='Helen'}                   -- count items
+coll % '{"age":33}'                     -- json query for count
 coll - {_id=X, a=9, ...}                -- remove object by id/query
 coll - {'_id1...', '_id2...', ...}      -- remove bulk items
 
-local rr = coll[{age=33}]               -- __iter'atable records
+local rr = coll[{name='Alex'}]          -- __iter'atable records
 print(tonumber(rr))                     -- lua5.1 #rr alternative for records length
+print(toboolean(rr))                    -- true for positive tonumber(rr)
 -rr                                     -- delete records from db
 
-_ = rr % t.matcher.valid                -- filter by matcher callable
-_ = rr * t.fn.queue_send                -- map/foreach
+rr % t.matcher.valid                    -- filter by matcher callable
+rr * t.fn.queue_send                    -- map/foreach
 
 for k,v in pairs(coll[{}]) do ...       -- iterate pairs: _id + object
 ```
