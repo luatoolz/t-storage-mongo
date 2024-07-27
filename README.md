@@ -2,44 +2,44 @@
 MongoDB object interface for `t` library.
 ```lua
 local t = require "t"
-local c = 'mongodb://srv:27017/secret'    -- standard mongodb connstring format
-local conn = t.storage.mongo(c)           -- use specific connection
-      or t.storage.mongo                  -- or use t.env defaults
-local mongo = mongo/'other'               -- change db
+local c = 'mongodb://srv:27017/secret'  -- standard mongodb connstring format
+local conn = t.storage.mongo(c)         -- use specific connection
+      or t.storage.mongo                -- or use t.env defaults
+local mongo = mongo/'other'             -- change db
 
-mongo ^ t.pluggable.objects               -- link mongo storage with pluggable objects by name
-mongo ^ {t.objects, {'any', 'name'}}      -- explicit linking
+mongo ^ t.pluggable.objects             -- link mongo storage with pluggable objects by name
+mongo ^ {t.objects, {'any', 'name'}}    -- explicit linking
 
-local coll = mongo['coll']                -- get collection from default mongo connection db
-coll = db.coll                            -- or get collection from specific db
+local coll = mongo['coll']              -- get collection from default mongo connection db
+coll = db.coll                          -- or get collection from specific db
 
 -- single record:
-local r = mongo.coll.id                   -- single record by id / object index fields
-print(r.field)                            -- print object field
-print(r:method(true))                     -- call object method
-_ = coll - r                              -- delete object record (by _id / index field)
+local r = mongo.coll.id                 -- single record by id / object index fields
+print(r.field)                          -- print object field
+print(r:method(true))                   -- call object method
+_ = coll - r                            -- delete object record (by _id / index field)
 
-_ = coll + r1 + r2 + ...                  -- save objects (oid auto created)
-_ = coll .. {r1, r2, ...}                 -- save objects using __concat
-coll[nil] = r                             -- save using __newindex (single object / bulk)
+_ = coll + r1 + r2 + ...                -- save objects (oid auto created)
+_ = coll .. {r1, r2, ...}               -- save objects using __concat
+coll[nil] = r                           -- save using __newindex (single object / bulk)
 
-coll.id = {a=7, b=88}                     -- save new / update existing (oid specified)
-coll[{_id=XY, ...}] = {a=8}               -- same
-coll[id1] = {_id=id2, a=7, b=88}          -- different _id on the assigned object is zeroed
+coll.id = {a=7, b=88}                   -- save new / update existing (oid specified)
+coll[{_id=XY, ...}] = {a=8}             -- same
+coll[id1] = {_id=id2, a=7, b=88}        -- different _id on the assigned object is zeroed
 
 -- multiple records:
-coll % {name='masha'}                     -- count query
-coll - {_id=X, a=9, ...}                  -- remove object by id/query
-coll - {'_id1...', '_id2...', ...}        -- remove bulk items
+coll % {name='masha'}                   -- count query
+coll - {_id=X, a=9, ...}                -- remove object by id/query
+coll - {'_id1...', '_id2...', ...}      -- remove bulk items
 
-local rr = coll[{age=33}]                 -- __iter'atable records
-print(tonumber(rr))                       -- records len 
--rr                                       -- delete records
+local rr = coll[{age=33}]               -- __iter'atable records
+print(tonumber(rr))                     -- records len 
+-rr                                     -- delete records
 
-rr % t.matcher.valid                      -- filter by matcher callable
-rr * t.fn.queue_send                      -- map/foreach
+rr % t.matcher.valid                    -- filter by matcher callable
+rr * t.fn.queue_send                    -- map/foreach
 
-for k,v in pairs(coll[{}]) do ...         -- iterate pairs: _id + object
+for k,v in pairs(coll[{}]) do ...       -- iterate pairs: _id + object
 ```
 
 ## t.storage.mongo.connection
