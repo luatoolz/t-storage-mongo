@@ -16,6 +16,7 @@ describe("collection", function()
     _ = -mongo.coll
   end)
   it("type", function()
+    assert.is_table(t)
     assert.not_nil(mongo)
     assert.equal('t/storage/mongo', t.type(mongo))
     assert.equal('t/storage/mongo', t.type(mongo()))
