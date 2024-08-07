@@ -1,8 +1,9 @@
-local t = require "t"
-local meta = require "meta"
-local is = t.is
-meta.no.track("mongo")
+local pkg = (...) or 't.storage.mongo'
 local driver = require "mongo"
+local t = require "t"
+local is = t.is ^ 'mongo'
+--meta.no.track("mongo")
+--local meta = require "meta"
 
 -- __  = t.storage.mongo.connection
 -- ___ = db name
@@ -26,4 +27,4 @@ return t.object({
   assert(self.collection, 'require self.collection')
   return self.collection({conn=self.__, db=self.___, k=k})
 end)
-:loader(..., true):factory()
+:loader(pkg):factory()
