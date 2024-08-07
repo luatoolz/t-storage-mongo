@@ -1,13 +1,11 @@
 local pkg = (...) or 't.storage.mongo'
-local driver = require "mongo"
 local t = require "t"
 local is = t.is ^ 'mongo'
---meta.no.track("mongo")
---local meta = require "meta"
+local driver = require "mongo"
+assert(driver, 'failed to load mongo driver')
 
 -- __  = t.storage.mongo.connection
 -- ___ = db name
-
 return t.object({
   __name='t/storage/mongo',
   __toboolean=function(self) return is.factory(self) and toboolean(self()) or toboolean(driver.Client(tostring(self.__)):getDatabaseNames()) end,
