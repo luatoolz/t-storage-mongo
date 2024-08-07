@@ -6,7 +6,7 @@ local escape = require "t.storage.mongo.escape"
 env.MONGO_PREFIX  = 'mongodb://'
 env.MONGO_HOST    = 'mongodb'
 env.MONGO_PORT    = '27017'
-env.MONGO_DB      = 'test'
+env.MONGO_DB      = 'db'
 --env.MONGO_USER
 --env.MONGO_PASS
 --env.MONGO_DB

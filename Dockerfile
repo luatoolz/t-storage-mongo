@@ -12,7 +12,7 @@ RUN apk add --no-cache \
 	luarocks
 
 RUN ln -s /usr/bin/luarocks-${LUA_VERSION} /usr/bin/luarocks
-RUN luarocks config lua_dir /usr
+RUN luarocks config --scope system lua_dir /usr
 
 FROM builder AS soft
 
