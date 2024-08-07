@@ -7,7 +7,7 @@ services:
       - 27017:27017
     tmpfs:
       - /data/db:size=512M,mode=1700
-      - /tmp:size=8M,mode=1777
+    command: mongod --quiet --logpath /dev/null --nounixsocket
     healthcheck:
       test: ["CMD","mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 1s

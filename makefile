@@ -11,4 +11,4 @@ up:
 	docker compose up -d --wait --wait-timeout 10 --no-log-prefix
 
 down:
-	docker compose down --remove-orphans
+	docker compose down --remove-orphans -v
