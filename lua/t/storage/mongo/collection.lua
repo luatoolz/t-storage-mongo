@@ -63,7 +63,7 @@ return setmetatable({}, {
     if is.table_with_id(id) then query = {_id = id._id} end
     if is.oid(id) then query = {_id = oid(id)} end
     if type(id) == 'table' and is.oid(id._id) then id._id = oid(id._id) end
-    if query then query=assert(self.__):findOne(query); return query and query:value() or query end -- record(self.__:findOne(query), self)
+    if query then query=assert(self.__):findOne(query); return query and query:value() or nil end -- record(self.__:findOne(query), self)
 
     -- multi records
     if id=='' or id=='*' then query={} end
