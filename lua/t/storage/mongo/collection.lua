@@ -1,10 +1,8 @@
+local driver = require 'mongo'
 local t = require "t"
 local is = t.is
-local driver = require 'mongo'
-local meta = require "meta"
-local require = meta.require(...)
+local records = require "t.storage.mongo.records"
 local oid = t.fn.combined(tostring, string.null, driver.ObjectID)
-local records = require ".records"
 local json = t.format.json
 
 local function normalize_table(x)

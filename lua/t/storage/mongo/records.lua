@@ -1,8 +1,6 @@
 local t = require "t"
 local is = t.is
-local meta = require "meta"
-local require = meta.require(...)
-local iter = require ".iter"
+local iter = require "t.storage.mongo.iter"
 
 return setmetatable({}, {
   __call=function(self, coll, query)

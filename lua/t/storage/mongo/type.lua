@@ -1,3 +1,3 @@
+local driver = require 'mongo'
 local t = require "t"
-local mongo = require 'mongo'
-return t.type ^ mongo.type
+return t.type ^ driver.type

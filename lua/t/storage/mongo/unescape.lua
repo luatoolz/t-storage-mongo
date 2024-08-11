@@ -1,3 +1,4 @@
+require "t"
 -- $ : / ? # [ ] @
 return function(self)
   if type(self)~='string' or self=='' then return nil end

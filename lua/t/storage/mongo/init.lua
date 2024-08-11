@@ -1,9 +1,8 @@
-local pkg = (...) or 't.storage.mongo'
-local meta = require "meta"
-local t = require "t"
 local driver = require "mongo"
 assert(driver, 'failed to load mongo driver')
-local _ = meta.loader(pkg).type
+local pkg = (...) or 't.storage.mongo'
+local t = require "t"
+require "t.storage.mongo.type"
 
 -- __  = t.storage.mongo.connection
 -- ___ = db name
