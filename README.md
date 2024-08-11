@@ -97,8 +97,8 @@ local db = t.storage.mongo(mongo.conn) or t.storage.mongo
 
 ## system depends
 alpine:
-- `mongo-c-driver`
-- `mongo-c-driver-dev`
+- `libbson-static`
+- `mongo-c-driver-static`
 
 debian:
 - `libmongoc-dev`
