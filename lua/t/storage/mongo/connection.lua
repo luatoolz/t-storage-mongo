@@ -3,15 +3,17 @@ local is = t.is
 local env = t.env
 local escape = require "t.storage.mongo.escape"
 
-env.MONGO_PREFIX  = 'mongodb://'
-env.MONGO_HOST    = 'mongodb'
-env.MONGO_PORT    = '27017'
-env.MONGO_DB      = 'db'
---env.MONGO_USER
---env.MONGO_PASS
---env.MONGO_DB
---env.MONGO_OPTIONS
---env.MONGO_CONNSTRING
+env({
+  MONGO_PREFIX='mongodb://',
+  MONGO_HOST='mongodb',
+  MONGO_PORT='27017',
+  MONGO_DB='db',
+--MONGO_USER
+--MONGO_PASS
+--MONGO_DB
+--MONGO_OPTIONS
+--MONGO_CONNSTRING
+})
 
 local function join(sep, ...)
   sep=sep or ''
@@ -79,17 +81,14 @@ return t.object({
   options = function(self) return (env.MONGO_OPTIONS or ''):lstrip('?'):null() end,
 }):computed({
   connstring=function(self)
-    if not env.MONGO_CONNSTRING then
-      local cred = join(':', self.user, self.pass)
-      local host = self.hosts and table.concat(self.hosts, ','):null() or join(':', self.host, self.port)
-      local credhost = join('@', cred, host)
-      local db = self.db
-      local hostdb = join('/', credhost, db)
-      local options = self.options
-      if options and not db then hostdb=hostdb..'/' end
-      local hostopts = join('?', hostdb, options)
-      env.MONGO_CONNSTRING=join('', self.prefix, hostopts)
-    end
-    return env.MONGO_CONNSTRING
+    local cred = join(':', self.user, self.pass)
+    local host = self.hosts and table.concat(self.hosts, ','):null() or join(':', self.host, self.port)
+    local credhost = join('@', cred, host)
+    local db = self.db
+    local hostdb = join('/', credhost, db)
+    local options = self.options
+    if options and not db then hostdb=hostdb..'/' end
+    local hostopts = join('?', hostdb, options)
+    return join('', self.prefix, hostopts)
   end,
 }):factory()

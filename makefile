@@ -12,3 +12,7 @@ up:
 
 down:
 	docker compose down --remove-orphans -v
+
+install:
+	sudo luarocks --lua-version=5.1 make
+	sudo luarocks --lua-version=5.3 make

@@ -11,4 +11,8 @@ describe("loading", function()
     assert.loader(storage)
     assert.table(mongo)
   end)
+  it("records", function()
+    local coll = mongo.coll
+--    assert.bulk(coll[{}])
+  end)
 end)

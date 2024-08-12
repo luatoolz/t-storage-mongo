@@ -1,43 +1,38 @@
 local driver = require 'mongo'
 local t = require "t"
 local is = t.is
+local normalize = require "t.storage.mongo.normalize"
 local records = require "t.storage.mongo.records"
-local oid = t.fn.combined(tostring, string.null, driver.ObjectID)
+local oid = require "t.storage.mongo.oid"
 local json = t.format.json
-
-local function normalize_table(x)
-  if type(x)=='table' then
-    setmetatable(x, nil)
-    if type(x[1])~='nil' then x.__array=true end
-    for k,v in pairs(x) do
-      if type(v)=='table' then
-        normalize_table(v)
-      end
-    end
-  end
-  return x
-end
 
 return setmetatable({}, {
   __add = function(self, x)
-    if type(x)=='number' then return self[{}]+x end
-    if is.json(x) then x = json.decode(x) end
-    if is.table.unindexed(x) or getmetatable(x or {}) then
--- TODO: pack table with metatable
-      assert(self.__):insert(x)
-      return self
-    end
+    if is.json(x) then x=json.decode(x) end
     if is.bulk(x) then return self .. x end
-    return self
+    if is.table.unindexed(x) or getmetatable(x or {}) then
+      x._id=oid(x._id)
+      return assert(self.__:insert(x)) and 1 or false
+    end -- TODO: pack table with metatable
+    return 0
   end,
   __call = function(self, ctx) return setmetatable({___=assert(ctx)}, getmetatable(self)) end,
   __concat = function(self, x)
+    local rv, e = 0
     if is.bulk(x) and not is.empty(x) then
-      local bulk = assert(self.__):createBulkOperation{ordered = true}
-      for it in table.iter(x) do bulk:insert(it) end
-      bulk:execute() -- t= { "nInserted" : 2, "nMatched" : 0, "nModified" : 0, "nRemoved" : 0, "nUpserted" : 0, "writeErrors" : [  ] }
+      local bulk = self.__:createBulkOperation{ordered = true}
+      for it in table.iter(x) do
+        if is.json_object(it) then it=json.decode(it) end
+        if type(it)=='table' and not is.bulk(it) then
+          x._id=oid(x._id)
+          bulk:insert(it)
+        end
+      end
+      local rv=assert(bulk:execute()) -- t= { "nInserted" : 2, "nMatched" : 0, "nModified" : 0, "nRemoved" : 0, "nUpserted" : 0, "writeErrors" : [  ] }
+      if rv then rv=rv:value() end
+      return (rv and #rv.writeErrors==0) and (tonumber(rv.nInserted or 0)+tonumber(rv.nUpserted or 0)) or false
     end
-    return self
+--    return rv
   end,
 --  __div = function(self, o) return self end,
   __index = function(self, id)
@@ -53,9 +48,9 @@ return setmetatable({}, {
 -- TODO: auto reconnect
 -- TODO: connection pool
     end
-    if type(id)=='nil' then return nil end
-    if type(id)=='number' then return self[{}][id] end
     local query
+--    if type(id)=='nil' then query={} end
+--    if type(id)=='number' then return self[{}][id] end
     if is.json_object(id) then query = json.decode(id) end
     if t.type(id) == 'mongo.ObjectID' then query = {_id = id} end
     if is.table_with_id(id) then query = {_id = id._id} end
@@ -64,7 +59,8 @@ return setmetatable({}, {
     if query then query=assert(self.__):findOne(query); return query and query:value() or nil end -- record(self.__:findOne(query), self)
 
     -- multi records
-    if id=='' or id=='*' then query={} end
+--    if type(id)=='nil' or id=='' or id=='*' then query={} end
+    if id=='*' then query={} end
     if (not query) and is.table_no_id(id) or is.table_empty(id) then query = id end
     if (not query) and is.json_object(id) then query = json.decode(id) end
     if query then
@@ -72,9 +68,21 @@ return setmetatable({}, {
       return records(self, query)
     end
     -- TODO: check PRIMARY, UNIQ, INDEX KEYS from object definition
-    return nil
   end,
-  __mod = function(self, x) return assert(self.__):count(x) end,
+  __mod = function(self, id)
+    local query
+    if type(id)=='nil' or id=='' or id=='*' then query={} end
+    if is.json_object(id) then query=json.decode(id) end
+    if t.type(id) == 'mongo.ObjectID' then query={_id = id} end
+    if is.table_with_id(id) then query = {_id = id._id} end
+    if is.oid(id) then query = {_id = oid(id)} end
+    if type(id) == 'table' and is.oid(id._id) then id._id = oid(id._id) end
+    if (not query) and is.table_no_id(id) or is.table_empty(id) then query = id end
+    if (not query) and is.json_object(id) then query = json.decode(id) end
+    query=query or {}
+    if query._id then query._id=oid(query._id) end
+    return self.__:count(query) or 0
+  end,
   __name='t/storage/mongo/collection',
   __newindex = function(self, id, x)
     if id == nil then
@@ -91,39 +99,44 @@ return setmetatable({}, {
     if is.oid(id) then query={_id=oid(id)} end
     if type(id)=='table' and is.oid(id._id) then query={_id=oid(id._id)} end
     if query then
-      if is.null(x) then assert(self.__):remove(query); return end
+      if is.null(x) then return self.__:remove(query) end
       if is.json(x) then x = json.decode(x) end
       if is.bulk(x) then error('error: coll.id=bulk()') end
       if is.table.unindexed(x) or getmetatable(x or {}) then
         x._id=nil
 -- TODO: pack table with metatable
-        normalize_table(x)
-        local ok, err = assert(self.__):update(query, x, {upsert = true})
-        if ok~=true then
-          error(err)
-        end
-        return
+        normalize(x)
+        return assert(self.__:update(query, x, {upsert = true}))
       end
       error(' __newindex wrong argument')
 -- TODO: log errors instead of error?
     end
-    return nil
   end,
-  __sub = function(self, x)
-    if type(x)=='nil' then return self end
-    if type(x)=='number' then return self[{}]-x end
-    if is.oid(x) then x = {_id = oid(x)} end
-    if t.type(x) == 'mongo.ObjectID' then x = {_id = x} end
-    if is.table.unindexed(x) then assert(self.__):remove(x); return self end
-    if is.bulk(x) then
-      local bulk = assert(self.__):createBulkOperation{ordered = false}
-      for it in table.iter(x) do bulk:remove(it) end
-      bulk:execute()
+  __sub=function(self, x)
+    local query
+    if is.table.empty(x) then query=x end
+    if x=='*' then query={} end
+    if is.oid(x) then query = {_id = oid(x)} end
+    if t.type(x) == 'mongo.ObjectID' then query = {_id = x} end
+    if is.table.unindexed(x) then
+      if x._id then query={_id=oid(x._id)} else query=x end
     end
-    return self
+    if is.bulk(x) and not is.empty(x) then
+      local bulk = self.__:createBulkOperation{ordered = false}
+      for it in table.iter(x) do
+        if is.json_object(it) then it=json.decode(it) end
+        if type(it)=='table' and not is.bulk(it) then
+          if it._id then bulk:remove({_id=oid(it._id)}) end
+        end
+      end
+      local rv=assert(bulk:execute()) -- t= { "nInserted" : 2, "nMatched" : 0, "nModified" : 0, "nRemoved" : 0, "nUpserted" : 0, "writeErrors" : [  ] }
+      return rv and #rv:value().writeErrors==0 or false
+    end
+    if type(query)~='table' then return true end
+    return assert(self.__:remove(query))
   end,
   __tostring=function(self) return assert(self.__):getName() or 't/storage/mongo/collection' end,
   __toboolean=function(self) return tonumber(self)>0 end,
-  __tonumber = function(self) return assert(self.__):count({}) or 0 end,
-  __unm = function(self) assert(self.__):removeMany({}); return self end,
+  __tonumber=function(self) return assert(self.__):count({}) or 0 end,
+  __unm=function(self) return assert(self.__:drop()) end,
 })
