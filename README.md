@@ -6,15 +6,14 @@ local mongo = t.storage.mongo
 
 local c = 'mongodb://srv:27017/secret'  -- standard mongodb connstring format
 local conn = mongo(c) or mongo          -- use specific connection or use t.env defaults
-local other = conn/'other'              -- try to change db using same credentials
+local db = conn/'db'                    -- try to change db using same credentials
 
-mongo ^ t.pluggable.objects             -- link mongo storage with pluggable objects by name
-mongo ^ {t.objects, {'any', 'name'}}    -- explicit linking
+mongo ^ t.pluggable.objects             -- link storage with pluggable objects
 
 local coll = mongo['coll']              -- get collection from default mongo connection db
 coll = db.coll                          -- or get collection from specific db
 
-local oid = mongo.ObjectID              -- this is mongo.ObjectID from lua-mongo
+local oid = mongo.oid                   -- extended mongo.ObjectID
 local _id = oid()                       -- generate random oid
 _id = oid('6690c3c574d428e23e0493c7')   -- use existing oid
 
@@ -28,7 +27,7 @@ print(r:method(true))                   -- call object method
 coll - {_id='XX', a=7}                  -- delete object record (by _id / index field)
 
 coll[nil] = {{a='x', b='y'}, {q=19}}    -- save using __newindex (single object / bulk)
-coll + r1 + r2 + ...                    -- save objects (oid auto created)
+coll + r1                               -- save objects (oid auto created)
 coll .. {r1, r2, ...}                   -- save objects using __concat
 coll + '[1,2,3,4,5]'                    -- json bulk assign
 
@@ -51,7 +50,8 @@ print(toboolean(rr))                    -- true for positive tonumber(rr)
 rr % t.matcher.valid                    -- filter by matcher callable
 rr * t.fn.queue_send                    -- map/foreach
 
-for k,v in pairs(coll[{}]) do ...       -- iterate pairs: _id + object
+for k,v in pairs(coll[{}]) do ...       -- iterate pairs: _id + object (__pairs)
+for it in table.iter(coll[{}]) do ...   -- iterate pairs: _id + object (__iter)
 ```
 
 ## t.storage.mongo.connection
