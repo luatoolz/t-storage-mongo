@@ -2,7 +2,6 @@ describe("collection", function()
   local t, is, mongo, iter, coll
   setup(function()
     t = require "t"
-    require "t.storage.mongo.connection"
     t.env.MONGO_HOST='127.0.0.1'
     is = t.is
     mongo = t.storage.mongo ^ t.data
@@ -19,7 +18,7 @@ describe("collection", function()
     assert.not_nil(mongo)
     assert.equal('t/storage/mongo', t.type(mongo))
     assert.equal('t/storage/mongo', t.type(mongo()))
-    assert.is_true(is.factory(mongo))
+    assert.factory(mongo)
     assert.equal('t/storage/mongo/collection', t.type(mongo.collection))
     assert.equal('t/storage/mongo/collection', t.type(mongo.coll))
   end)
@@ -126,17 +125,12 @@ describe("collection", function()
     assert.is_nil(coll.any)
 
     assert.equal(1, coll + {name='some'})
---    assert.equal(0, tonumber(-coll))
     assert.truthy(-coll)
     assert.equal(1, tonumber(coll + {name='some'}))
     assert.is_true(is.oid(table.map(iter(coll[{}]))[1]._id))
---    assert.is_true(is.oid(coll[{}][1]._id))
---    assert.oid(coll[1]._id)
---    assert.oid(coll[{}][1]._id)
-
---    assert.equal(1, coll+0)
---    assert.equal(1, coll-0)
-
+    assert.is_true(is.oid(coll[{}][1]._id))
+    assert.oid(coll[1]._id)
+    assert.oid(coll[{}][1]._id)
     assert.truthy(-coll)
   end)
   it("empty2", function()
@@ -220,8 +214,6 @@ describe("collection", function()
     assert.equal(2, tonumber(coll))
     assert.equal(2, tonumber(coll[{}]))
     assert.equal(2, tonumber(coll))
---    assert.equal(2, coll[{}]+0)
---    assert.equal(2, coll[{}]-0)
 
     local c=0
     for i,v in pairs(coll[{}]) do c=c+1 end
@@ -233,7 +225,5 @@ describe("collection", function()
 
     assert.truthy(coll-{})
     assert.equal(0, tonumber(coll))
---    assert.equal(0, coll[{}]+0)
---    assert.equal(0, coll[{}]-0)
   end)
 end)

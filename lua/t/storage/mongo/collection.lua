@@ -18,7 +18,7 @@ return setmetatable({}, {
   end,
   __call = function(self, ctx) return setmetatable({___=assert(ctx)}, getmetatable(self)) end,
   __concat = function(self, x)
-    local rv, e = 0
+    local rv
     if is.bulk(x) and not is.empty(x) then
       local bulk = self.__:createBulkOperation{ordered = true}
       for it in table.iter(x) do
@@ -28,7 +28,7 @@ return setmetatable({}, {
           bulk:insert(it)
         end
       end
-      local rv=assert(bulk:execute()) -- t= { "nInserted" : 2, "nMatched" : 0, "nModified" : 0, "nRemoved" : 0, "nUpserted" : 0, "writeErrors" : [  ] }
+      rv=assert(bulk:execute()) -- t= { "nInserted" : 2, "nMatched" : 0, "nModified" : 0, "nRemoved" : 0, "nUpserted" : 0, "writeErrors" : [  ] }
       if rv then rv=rv:value() end
       return (rv and #rv.writeErrors==0) and (tonumber(rv.nInserted or 0)+tonumber(rv.nUpserted or 0)) or false
     end
@@ -50,7 +50,7 @@ return setmetatable({}, {
     end
     local query
 --    if type(id)=='nil' then query={} end
---    if type(id)=='number' then return self[{}][id] end
+    if type(id)=='number' then return self[{}][id] end
     if is.json_object(id) then query = json.decode(id) end
     if t.type(id) == 'mongo.ObjectID' then query = {_id = id} end
     if is.table_with_id(id) then query = {_id = id._id} end

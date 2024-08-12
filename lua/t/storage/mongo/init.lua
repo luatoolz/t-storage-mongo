@@ -3,8 +3,6 @@ local t = require "t"
 local is = t.is ^ 'mongo'
 require "t.storage.mongo.type"
 local driver = assert(require("mongo"))
-local meta = require "meta"
-local no = meta.no
 
 -- __  = t.storage.mongo.connection
 -- ___ = db name

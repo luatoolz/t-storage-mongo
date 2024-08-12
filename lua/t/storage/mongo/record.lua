@@ -1,7 +1,6 @@
-local meta = require "meta"
+require "t"
 local driver = require "mongo"
-local clone = meta.clone
-local oid = mongo.ObjectID
+local oid = require "t.storage.mongo.oid"
 
 return setmetatable({}, {
   __call=function(self, o, ctx)
@@ -13,7 +12,7 @@ return setmetatable({}, {
     end
   end,
 --  __pow=function(self, o) if o then self.__=o end; return self; end,
-  __unm=function(self) if self._id then self.__:remove({_id=oid(self._id)}) end; return self.__ end,
+  __unm=function(self) if self._id then return self.__:remove({_id=oid(self._id)}) end end,
   __pairs=function(self) local k,v return function() repeat k,v=next(self, k); until k~='__'; return k,v; end end,
-  __toboolean=function(self) return next(clone(self))~=nil end,
+--  __toboolean=function(self) return type(next(clone(self))~=nil end,
 })

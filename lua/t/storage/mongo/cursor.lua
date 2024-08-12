@@ -3,8 +3,8 @@ require "t"
 
 local client = assert(driver.Client('mongodb://mongodb'))
 local coll = assert(client:getCollection('test', 'test'))
-local cursor = assert(coll:find({}))
-local mt = debug.getmetatable(cursor)
+local cur = assert(coll:find({}))
+local mt = debug.getmetatable(cur)
 
 if type(mt.__iter)=='nil' then
   mt.__iter = function(cursor, handler)

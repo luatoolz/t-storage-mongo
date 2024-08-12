@@ -2,6 +2,7 @@ describe("loading", function()
   local t, storage, mongo, driver
   setup(function()
     t = require "t"
+    t.env.MONGO_HOST='127.0.0.1'
     storage = t.storage
     mongo = storage.mongo
     driver = require "mongo"
@@ -12,7 +13,5 @@ describe("loading", function()
     assert.table(mongo)
   end)
   it("records", function()
-    local coll = mongo.coll
---    assert.bulk(coll[{}])
   end)
 end)
