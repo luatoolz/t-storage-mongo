@@ -3,6 +3,15 @@ local oid = driver.ObjectID
 local t = require "t"
 local is = t.is
 local json = t.format.json
+local getmetatable = debug.getmetatable or getmetatable
+
+local mt = getmetatable(oid())
+if type(mt.__tojson)=='nil' then
+  mt.__tojson = function(self)
+    return tostring(self)
+  end
+  mt.__toJSON = mt.__tojson
+end
 
 -- TODO normalize
 return function(x)
