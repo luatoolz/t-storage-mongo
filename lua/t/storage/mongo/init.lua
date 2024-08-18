@@ -1,8 +1,10 @@
+require "compat53"
 local pkg = (...) or 't.storage.mongo'
-local t = require "t"
+local t = t or require "t"
 local is = t.is ^ 'mongo'
 require "t.storage.mongo.type"
 local driver = assert(require("mongo"))
+require "t.storage.mongo.cursor"
 
 -- __  = t.storage.mongo.connection
 -- ___ = db name
