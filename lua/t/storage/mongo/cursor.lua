@@ -1,5 +1,9 @@
-local driver = require 'mongo'
-require "t"
+-- this file is loaded in init.d, so use global "t"
+local t = assert(t)
+local driver = assert(require 'mongo')
+local iter = assert(require "t.storage.mongo.iter")
+local json = assert(require "t.format.json")
+assert(tojson)
 
 local client = assert(driver.Client('mongodb://mongodb'))
 local coll = assert(client:getCollection('test', 'test'))
@@ -22,3 +26,15 @@ if type(mt.__call)=='nil' then
     return it()
   end
 end
+
+if type(mt.__tojson)=='nil' then
+  mt.__tojson = function(cursor)
+    local jsoner = function(x) return tojson(x, true) end
+    return table.map(iter(it, jsoner))
+  end
+  mt.__toJSON = mt.__tojson
+end
+
+assert(mt.__iter)
+assert(mt.__call)
+assert(mt.__tojson)
