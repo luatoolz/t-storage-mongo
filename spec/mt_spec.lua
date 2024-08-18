@@ -1,12 +1,13 @@
 describe("collection", function()
-  local t, is, mongo, driver, oid, mongo_type
+  local t, is, mongo, driver, oid, mongo_type, json
   setup(function()
-    driver = require 'mongo'
     t = require "t"
     is = t.is
+    driver = require 'mongo'
     mongo = require "t.storage.mongo"
     oid = mongo.oid
     mongo_type = require "t.storage.mongo.type"
+    json = t.format.json
   end)
   it("oid", function()
     local id = '66909d26cbade70b6b022b9a'
@@ -28,10 +29,7 @@ describe("collection", function()
     assert.equal('userdata', type(moid))
 
     local mt = debug.getmetatable(moid)
-    mt.__tojson = function(self) return tostring(self) end
-    mt.__toJSON = mt.__tojson
-
-    assert.is_function(debug.getmetatable(moid).__toJSON)
+    assert.is_function(debug.getmetatable(moid).__tojson)
     moid = mongo.ObjectID('66909d26cbade70b6b022b9a')
     assert.equal('66909d26cbade70b6b022b9a', tostring(moid))
     assert.equal('66909d26cbade70b6b022b9a', debug.getmetatable(moid).__tojson(moid))
@@ -62,9 +60,10 @@ describe("collection", function()
     local client = assert(driver.Client('mongodb://mongodb'))
     local coll = assert(client:getCollection('test', 'test'))
     local cursor = assert(coll:find({}))
+
     assert.equal('userdata', type(cursor))
     assert.equal('mongo.Cursor', t.type(cursor))
-    assert.is_table(debug.getmetatable(cursor))
+    assert.equal('[]', tojson(cursor))
   end)
   it("int64", function()
     local int64 = driver.Int64
