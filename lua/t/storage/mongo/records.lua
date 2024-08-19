@@ -3,6 +3,7 @@ local is = t.is
 local iter = require "t.storage.mongo.iter"
 local json = t.format.json
 local jsoner = function(x) return tojson(x, true) end
+local tocursor = require "t.storage.mongo.cursor"
 
 return setmetatable({}, {
   __call=function(self, coll, query)
@@ -13,7 +14,7 @@ return setmetatable({}, {
   end,
   __eq=function(self, to) return t.type(self)==t.type(to) and self.coll and tostring(self.coll)==tostring(to.coll) and is.eq(self.query, to.query) end,
   __index=function(self, k) return type(k)=='number' and table.map(iter(self))[k] or rawget(self, k) end,
-  __iter=function(self, handler) return iter(self.__:find(self.query), handler) end,
+  __iter=function(self, handler) return iter(tocursor(self.__:find(self.query)), handler) end,
   __len=function(self) return tonumber(self) end,
   __mod=table.filter,
   __mul=table.map,
