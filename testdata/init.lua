@@ -1,3 +1,1 @@
-local pkg = ...
-local meta = require "meta"
-return meta.loader(pkg, false, true)
+return require("meta").loader(..., false, true)
