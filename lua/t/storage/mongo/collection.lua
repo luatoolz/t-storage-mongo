@@ -59,6 +59,18 @@ return setmetatable({}, {
     if is.oid(id) then query = {_id = oid(id)} end
 --    if type(id) == 'table' and is.oid(id._id) then id._id = oid(id._id) end
 
+    if (not query) and type(id)=='string' and #id>0 and not (id=='' or id=='*') and type(self.___)=='table' then
+      local o=   self.___.objects
+      local item=self.___.item
+      if o and item then
+        local ids=(((item or {})[true] or {}).id or ''):split(' ')
+        if ids[1] then
+          query={}
+          query[ids[1]]=id
+        end
+      end
+    end
+
     if query then query=assert(self.__):findOne(query); return query and query:value() or nil end -- record(self.__:findOne(query), self)
 
     -- multi records
