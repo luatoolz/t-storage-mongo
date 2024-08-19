@@ -4,6 +4,6 @@ return {
     verbose = true,
     coverage = false,
     recursive = true,
-    lpath = "lua/?.lua;lua/?/init.lua;;",
+    lpath = "lua/?.lua;lua/?/init.lua;?.lua;?/init.lua;;",
   }
 }
