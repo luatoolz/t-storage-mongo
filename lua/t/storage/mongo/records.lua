@@ -2,7 +2,7 @@ local t = t or require "t"
 local is = t.is
 local iter = require "t.storage.mongo.iter"
 local json = t.format.json
-local jsoner = function(x) return tojson(x, true) end
+local jsoner = function(x) return json(x, true) end
 local tocursor = require "t.storage.mongo.cursor"
 
 return setmetatable({}, {

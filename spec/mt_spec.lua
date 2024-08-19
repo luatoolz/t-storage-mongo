@@ -29,7 +29,6 @@ describe("collection", function()
     assert.equal('function', type(mongo.ObjectID))
     assert.equal('userdata', type(moid))
 
-    local mt = debug.getmetatable(moid)
     assert.is_function(debug.getmetatable(moid).__tojson)
     moid = mongo.ObjectID('66909d26cbade70b6b022b9a')
     assert.equal('66909d26cbade70b6b022b9a', tostring(moid))
@@ -66,7 +65,7 @@ describe("collection", function()
 
     assert.equal('userdata', type(cursor))
     assert.equal('mongo.Cursor', t.type(cursor))
-    assert.equal('[]', tojson(cursor))
+    assert.equal('[]', json(cursor))
   end)
   it("int64", function()
     local int64 = driver.Int64
