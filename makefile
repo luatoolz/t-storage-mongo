@@ -5,6 +5,8 @@ test: up busted down
 
 busted:
 	busted-5.3 .
+	busted-5.1 .
+	busted-5.3 --no-auto-insulate .
 	busted-5.1 --no-auto-insulate .
 
 up:
@@ -16,3 +18,7 @@ down:
 install:
 	sudo luarocks --lua-version=5.1 make
 	sudo luarocks --lua-version=5.3 make
+
+remove:
+	sudo luarocks --lua-version=5.1 remove *.rockspec
+	sudo luarocks --lua-version=5.3 remove *.rockspec
