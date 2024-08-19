@@ -2,6 +2,7 @@ describe("collection", function()
   local t, is, mongo, driver, oid, mongo_type, json
   setup(function()
     t = require "t"
+    t.env.MONGO_HOST='127.0.0.1'
     is = t.is
     driver = require 'mongo'
     mongo = require "t.storage.mongo"
@@ -41,13 +42,13 @@ describe("collection", function()
     assert.is_table(debug.getmetatable(bson))
   end)
   it("collection", function()
-    local client = assert(driver.Client('mongodb://mongodb'))
+    local client = assert(driver.Client('mongodb://localhost'))
     local coll = assert(client:getCollection('test', 'test'))
     assert.equal('userdata', type(coll))
     assert.is_table(debug.getmetatable(coll))
   end)
   it("bulk", function()
-    local client = assert(driver.Client('mongodb://mongodb'))
+    local client = assert(driver.Client('mongodb://localhost'))
     local coll = assert(client:getCollection('test', 'test'))
     local bulk = assert(coll:createBulkOperation())
     assert.is_table(debug.getmetatable(bulk))
@@ -57,9 +58,11 @@ describe("collection", function()
     assert.is_table(debug.getmetatable(bson))
   end)
   it("cursor", function()
-    local client = assert(driver.Client('mongodb://mongodb'))
+    local tocursor = require "t.storage.mongo.cursor"
+
+    local client = assert(driver.Client('mongodb://localhost'))
     local coll = assert(client:getCollection('test', 'test'))
-    local cursor = assert(coll:find({}))
+    local cursor = tocursor(assert(coll:find({})))
 
     assert.equal('userdata', type(cursor))
     assert.equal('mongo.Cursor', t.type(cursor))
