@@ -36,7 +36,8 @@ return setmetatable({}, {
   end,
 --  __div = function(self, o) return self end,
   __index = function(self, id)
-    if id=='__' and self.___ then
+    if id=='__' then
+      if not self.___ then return nil end
       local ctx = self.___
       local conn = ctx.conn
       local k = ctx.k
@@ -48,19 +49,21 @@ return setmetatable({}, {
 -- TODO: auto reconnect
 -- TODO: connection pool
     end
+    if type(id)=='string' and id:match('^__') then return nil end
     local query
 --    if type(id)=='nil' then query={} end
     if type(id)=='number' then return self[{}][id] end
     if is.json_object(id) then query = json.decode(id) end
     if t.type(id) == 'mongo.ObjectID' then query = {_id = id} end
-    if is.table_with_id(id) then query = {_id = id._id} end
+    if is.table_with_id(id) then query = {_id = oid(id._id)} end
     if is.oid(id) then query = {_id = oid(id)} end
-    if type(id) == 'table' and is.oid(id._id) then id._id = oid(id._id) end
+--    if type(id) == 'table' and is.oid(id._id) then id._id = oid(id._id) end
+
     if query then query=assert(self.__):findOne(query); return query and query:value() or nil end -- record(self.__:findOne(query), self)
 
     -- multi records
---    if type(id)=='nil' or id=='' or id=='*' then query={} end
-    if id=='*' then query={} end
+    if type(id)=='nil' or id=='' or id=='*' or is.table.empty(id) then query={} end
+--    if id=='*' then query={} end
     if (not query) and is.table_no_id(id) or is.table_empty(id) then query = id end
     if (not query) and is.json_object(id) then query = json.decode(id) end
     if query then
@@ -92,6 +95,7 @@ return setmetatable({}, {
       if is.table.unindexed(x) or getmetatable(x or {}) then return self + x end
     end
     local query
+    if type(id)=='nil' or id=='' or id=='*' then query={} end
     if is.json(id) then query = json.decode(id) end
     if t.type(id) == 'mongo.ObjectID' then query={_id=id} end
     if is.table_no_id(id) or is.table_empty(id) then query=id end
@@ -115,7 +119,7 @@ return setmetatable({}, {
   __sub=function(self, x)
     local query
     if is.table.empty(x) then query=x end
-    if x=='*' then query={} end
+    if type(id)=='nil' or id=='' or id=='*' or is.table.empty(id) then query={} end
     if is.oid(x) then query = {_id = oid(x)} end
     if t.type(x) == 'mongo.ObjectID' then query = {_id = x} end
     if is.table.unindexed(x) then
@@ -135,7 +139,7 @@ return setmetatable({}, {
     if type(query)~='table' then return true end
     return assert(self.__:remove(query))
   end,
-  __tostring=function(self) return assert(self.__):getName() or 't/storage/mongo/collection' end,
+  __tostring=function(self) return type(next(self))~='nil' and assert(self.__):getName() or 't/storage/mongo/collection' end,
   __toboolean=function(self) return tonumber(self)>0 end,
   __tonumber=function(self) return assert(self.__):count({}) or 0 end,
   __unm=function(self) return assert(self.__:drop()) end,
