@@ -1,5 +1,5 @@
 describe("data", function()
-  local t, mongo, test_coll, coll, testdata
+  local t, mongo, coll, testdata
   setup(function()
     t = require "t"
     t.env.MONGO_HOST='localhost'
@@ -19,7 +19,7 @@ describe("data", function()
     assert.is_true(toboolean(mongo()))
   end)
   it("create", function()
-    local coll = mongo.test_coll
+    coll = mongo.test_coll
     assert.is_table(coll.___.item)
 
     _ = coll + ('[{"token":"95687c9a1a88dd2d552438573dd018748dfff0222c76f085515be2dc1db2afa7","role":"root"},' ..

@@ -131,7 +131,7 @@ return setmetatable({}, {
   __sub=function(self, x)
     local query
     if is.table.empty(x) then query=x end
-    if type(id)=='nil' or id=='' or id=='*' or is.table.empty(id) then query={} end
+    if type(x)=='nil' or x=='' or x=='*' or is.table.empty(x) then query={} end
     if is.oid(x) then query = {_id = oid(x)} end
     if t.type(x) == 'mongo.ObjectID' then query = {_id = x} end
     if is.table.unindexed(x) then
