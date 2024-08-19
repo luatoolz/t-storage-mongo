@@ -1,10 +1,12 @@
 describe("collection", function()
-  local t, is, mongo, iter, coll, json
+  local t, is, mongo, iter, coll, json, testdata
   setup(function()
     t = require "t"
     t.env.MONGO_HOST='127.0.0.1'
     is = t.is
-    mongo = t.storage.mongo ^ t.data
+    testdata = require "testdata"
+    assert(testdata.data)
+    mongo = t.storage.mongo ^ testdata.data
     iter = mongo.iter
     coll = mongo.coll
     json = t.format.json
@@ -38,7 +40,7 @@ describe("collection", function()
     assert.not_equal(a, b)
   end)
   it("findOne", function()
-    assert.is_table(mongo.coll.___.item)
+    assert.is_table(mongo.test_coll.___.item)
 
     assert.truthy(-coll)
     assert.is_false(toboolean(coll))
@@ -79,8 +81,9 @@ describe("collection", function()
 
     local _id=mongo.ObjectID()
     _ = coll + {_id=_id, name='some', try=1}
-    assert.is_true(coll-0)
+
     assert.equal(true, toboolean(coll[{_id=_id}]))
+    assert.equal(true, toboolean(coll[_id]))
 
     assert.equal(2, coll .. {{name='some', try=2}, {name='some', try=3}})
     assert.equal(3, tonumber(coll))
@@ -130,6 +133,9 @@ describe("collection", function()
 
     local found = json(coll[{}]):lstrip('['):rstrip(']'):gsub('%}%,%{', '}|{'):split('|')
     assert.same(z, table.tohash(found))
+
+--    assert.is_table(coll['66ba9cdee46231517f065198'])
+--    assert.is_table(coll['95687c9a1a88dd2d552438573dd018748dfff0222c76f085515be2dc1db2afa7'])
   end)
   it("empty", function()
     assert.equal('t/storage/mongo/collection', t.type(coll))
