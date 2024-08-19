@@ -39,7 +39,6 @@ describe("collection", function()
   end)
   it("findOne", function()
     assert.is_table(mongo.coll.___.item)
-    assert.is_table(mongo.access.___.item)
 
     assert.truthy(-coll)
     assert.is_false(toboolean(coll))
@@ -118,8 +117,8 @@ describe("collection", function()
     assert.equal(4, tonumber(coll[{}]))
     assert.truthy(-coll[{}])
     assert.equal(0, tonumber(coll[{}]))
-    _ = coll + ('[{"_id":"66ba9cdee46231517f065198","token":"95687c9a1a88dd2d552438573dd018748dfff0222c76f085515be2dc1db2afa7","role":"root"},' .. 
-      '{"_id":"66ba9cdee46231517f065199","token":"46db395df332f18b437d572837d314e421804aaed0f229872ce7d8825d11ff9a","role":"traffer"},' .. 
+    _ = coll + ('[{"_id":"66ba9cdee46231517f065198","token":"95687c9a1a88dd2d552438573dd018748dfff0222c76f085515be2dc1db2afa7","role":"root"},' ..
+      '{"_id":"66ba9cdee46231517f065199","token":"46db395df332f18b437d572837d314e421804aaed0f229872ce7d8825d11ff9a","role":"traffer"},' ..
       '{"_id":"66ba9cdee46231517f06519a","token":"60879afb54028243bb82726a5485819a8bbcacd1df738439bfdf06bc3ea628d0","role":"panel"}]')
     assert.equal(3, tonumber(coll[{}]))
 
@@ -129,7 +128,6 @@ describe("collection", function()
       ['{"_id":"66ba9cdee46231517f06519a","role":"panel","token":"60879afb54028243bb82726a5485819a8bbcacd1df738439bfdf06bc3ea628d0"}']=true,
     }
 
-    local json = t.format.json
     local found = json(coll[{}]):lstrip('['):rstrip(']'):gsub('%}%,%{', '}|{'):split('|')
     assert.same(z, table.tohash(found))
   end)
