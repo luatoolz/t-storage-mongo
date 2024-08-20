@@ -22,6 +22,7 @@ return t.object({
     return setmetatable({__=conn, ___=db, __objects=self.__objects}, getmetatable(self))
   end,
   __pow=function(self, to) -- tie to objects, loader or any indexable
+    assert(type(to)=='table')
     self.__objects=to
     return self
   end,

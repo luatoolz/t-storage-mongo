@@ -14,7 +14,7 @@ describe("collection", function()
   before_each(function()
     t.env.MONGO_CONNSTRING=nil
     coll = mongo.coll
-    _ = -mongo.coll
+    _ = -mongo.coll[{}]
   end)
   it("type", function()
     assert.is_table(t)
@@ -120,10 +120,12 @@ describe("collection", function()
     assert.equal(4, tonumber(coll[{}]))
     assert.truthy(-coll[{}])
     assert.equal(0, tonumber(coll[{}]))
-    _ = coll + ('[{"_id":"66ba9cdee46231517f065198","token":"95687c9a1a88dd2d552438573dd018748dfff0222c76f085515be2dc1db2afa7","role":"root"},' ..
+    assert.equal(3, coll + ('[{"_id":"66ba9cdee46231517f065198","token":"95687c9a1a88dd2d552438573dd018748dfff0222c76f085515be2dc1db2afa7","role":"root"},' ..
       '{"_id":"66ba9cdee46231517f065199","token":"46db395df332f18b437d572837d314e421804aaed0f229872ce7d8825d11ff9a","role":"traffer"},' ..
-      '{"_id":"66ba9cdee46231517f06519a","token":"60879afb54028243bb82726a5485819a8bbcacd1df738439bfdf06bc3ea628d0","role":"panel"}]')
-    assert.equal(3, tonumber(coll[{}]))
+      '{"_id":"66ba9cdee46231517f06519a","token":"60879afb54028243bb82726a5485819a8bbcacd1df738439bfdf06bc3ea628d0","role":"panel"}]'))
+
+--    assert.equal(3, tonumber(table.map(iter(coll[{}]))))
+    assert.equal(3, tonumber(coll))
 
     local z = {
       ['{"_id":"66ba9cdee46231517f065198","role":"root","token":"95687c9a1a88dd2d552438573dd018748dfff0222c76f085515be2dc1db2afa7"}']=true,
@@ -143,6 +145,14 @@ describe("collection", function()
     assert.is_table(coll[{_id='66ba9cdee46231517f065199'}])
     assert.is_table(coll['66ba9cdee46231517f065199'])
     assert.is_table(coll['95687c9a1a88dd2d552438573dd018748dfff0222c76f085515be2dc1db2afa7'])
+
+    local dat = '[{"token":"95687c9a1a88dd2d552438573dd018748dfff0222c76f085515be2dc1db2afa7","role":"root"},' ..
+                '{"token":"46db395df332f18b437d572837d314e421804aaed0f229872ce7d8825d11ff9a","role":"traffer"},' ..
+                '{"token":"60879afb54028243bb82726a5485819a8bbcacd1df738439bfdf06bc3ea628d0","role":"panel"}]'
+
+    local jdat = json.decode(dat)
+    assert.equal('95687c9a1a88dd2d552438573dd018748dfff0222c76f085515be2dc1db2afa7', jdat[1].token)
+
   end)
   it("empty", function()
     assert.equal('t/storage/mongo/collection', t.type(coll))

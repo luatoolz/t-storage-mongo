@@ -5,6 +5,7 @@ local normalize = require "t.storage.mongo.normalize"
 local records = require "t.storage.mongo.records"
 local oid = require "t.storage.mongo.oid"
 local json = t.format.json
+--local inspect = require 'inspect'
 
 return setmetatable({}, {
   __add = function(self, x)
@@ -22,11 +23,9 @@ return setmetatable({}, {
     if is.bulk(x) and not is.empty(x) then
       local bulk = self.__:createBulkOperation{ordered = true}
       for it in table.iter(x) do
-        if is.json_object(it) then
-          it=json.decode(it)
-        end
+        if is.json_object(it) then it=json.decode(it) end
         if type(it)=='table' and not is.bulk(it) then
-          it._id=oid(it._id)
+          if it._id then it._id=oid(it._id) end
           bulk:insert(it)
         end
       end
@@ -34,6 +33,7 @@ return setmetatable({}, {
       if rv then rv=rv:value() end
       return (rv and #rv.writeErrors==0) and (tonumber(rv.nInserted or 0)+tonumber(rv.nUpserted or 0)) or false
     end
+    return 0
   end,
 --  __div = function(self, o) return self end,
   __index = function(self, id)
@@ -59,8 +59,9 @@ return setmetatable({}, {
     if is.oid(id) then query = {_id = oid(id)} end
 
     if (not query) and type(id)=='string' and #id>0 and not (id=='' or id=='*') and type(self.___)=='table' then
+--      local objs=self.___.objects
       local item=self.___.item
-      if item then query=item % id end
+      if type(item)=='table' and (getmetatable(item) or {}).__mod then query=(item % id) end
     end
 
     if query then query=self.__:findOne(query); return query and query:value() or nil end -- record(self.__:findOne(query), self)
@@ -77,17 +78,17 @@ return setmetatable({}, {
   end,
   __mod = function(self, id)
     local query
-    if type(id)=='nil' or id=='' or id=='*' then query={} end
+    if type(id)=='nil' or id=='' or id=='*' or is.table_empty(id) then query={} end
     if is.json_object(id) then query=json.decode(id) end
     if t.type(id) == 'mongo.ObjectID' then query={_id = id} end
-    if is.table_with_id(id) then query = {_id = id._id} end
+    if is.table_with_id(id) then query = {_id = oid(id._id)} end
     if is.oid(id) then query = {_id = oid(id)} end
     if type(id) == 'table' and is.oid(id._id) then id._id = oid(id._id) end
-    if (not query) and is.table_no_id(id) or is.table_empty(id) then query = id end
-    if (not query) and is.json_object(id) then query = json.decode(id) end
-    query=query or {}
-    if query._id then query._id=oid(query._id) end
-    return self.__:count(query) or 0
+    if (not query) and is.table_no_id(id) then query = id end
+--    if (not query) and is.json_object(id) then query = json.decode(id) end
+--    query=query or {}
+    if query and query._id then query._id=oid(query._id) end
+    return query and self.__:count(query) or 0
   end,
   __name='t/storage/mongo/collection',
   __newindex = function(self, id, x)
@@ -140,10 +141,10 @@ return setmetatable({}, {
       return rv and #rv:value().writeErrors==0 or false
     end
     if type(query)~='table' then return true end
-    return assert(self.__:remove(query))
+    return query and assert(self.__:remove(query)) or nil
   end,
   __tostring=function(self) return type(next(self))~='nil' and assert(self.__):getName() or 't/storage/mongo/collection' end,
   __toboolean=function(self) return tonumber(self)>0 end,
-  __tonumber=function(self) return assert(self.__):count({}) or 0 end,
+  __tonumber=function(self) return assert(self.__):count({}) end,
   __unm=function(self) return assert(self.__:drop()) end,
 })
