@@ -7,11 +7,11 @@ describe("data", function()
     t.env.MONGO_PASS=nil
     testdata = require "testdata"
     assert(testdata.data)
-    assert(testdata.data.test_coll)
+    assert(testdata.data.coll)
     mongo = t.storage.mongo ^ testdata.data
   end)
   before_each(function()
-    coll = mongo.test_coll
+    coll = mongo.coll
     _ = -coll
   end)
   it("connect", function()
@@ -19,7 +19,6 @@ describe("data", function()
     assert.is_true(toboolean(mongo()))
   end)
   it("create", function()
-    coll = mongo.test_coll
     assert.is_table(coll.___.item)
 
     _ = coll + ('[{"token":"95687c9a1a88dd2d552438573dd018748dfff0222c76f085515be2dc1db2afa7","role":"root"},' ..

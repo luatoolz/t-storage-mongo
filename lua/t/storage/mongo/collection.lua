@@ -22,9 +22,11 @@ return setmetatable({}, {
     if is.bulk(x) and not is.empty(x) then
       local bulk = self.__:createBulkOperation{ordered = true}
       for it in table.iter(x) do
-        if is.json_object(it) then it=json.decode(it) end
+        if is.json_object(it) then
+          it=json.decode(it)
+        end
         if type(it)=='table' and not is.bulk(it) then
-          x._id=oid(x._id)
+          it._id=oid(it._id)
           bulk:insert(it)
         end
       end
@@ -32,7 +34,6 @@ return setmetatable({}, {
       if rv then rv=rv:value() end
       return (rv and #rv.writeErrors==0) and (tonumber(rv.nInserted or 0)+tonumber(rv.nUpserted or 0)) or false
     end
---    return rv
   end,
 --  __div = function(self, o) return self end,
   __index = function(self, id)
@@ -51,31 +52,21 @@ return setmetatable({}, {
     end
     if type(id)=='string' and id:match('^__') then return nil end
     local query
---    if type(id)=='nil' then query={} end
     if type(id)=='number' then return self[{}][id] end
-    if is.json_object(id) then query = json.decode(id) end
-    if t.type(id) == 'mongo.ObjectID' then query = {_id = id} end
+    if is.json_object(id) then id = json.decode(id) end
+    if t.type(id)=='mongo.ObjectID' then query = {_id = oid(id)} end
     if is.table_with_id(id) then query = {_id = oid(id._id)} end
     if is.oid(id) then query = {_id = oid(id)} end
---    if type(id) == 'table' and is.oid(id._id) then id._id = oid(id._id) end
 
     if (not query) and type(id)=='string' and #id>0 and not (id=='' or id=='*') and type(self.___)=='table' then
-      local o=   self.___.objects
       local item=self.___.item
-      if o and item then
-        local ids=(((item or {})[true] or {}).id or ''):split(' ')
-        if ids[1] then
-          query={}
-          query[ids[1]]=id
-        end
-      end
+      if item then query=item % id end
     end
 
-    if query then query=assert(self.__):findOne(query); return query and query:value() or nil end -- record(self.__:findOne(query), self)
+    if query then query=self.__:findOne(query); return query and query:value() or nil end -- record(self.__:findOne(query), self)
 
     -- multi records
     if type(id)=='nil' or id=='' or id=='*' or is.table.empty(id) then query={} end
---    if id=='*' then query={} end
     if (not query) and is.table_no_id(id) or is.table_empty(id) then query = id end
     if (not query) and is.json_object(id) then query = json.decode(id) end
     if query then
