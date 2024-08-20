@@ -94,6 +94,7 @@ describe("collection", function()
     assert.is_true(coll - {try=5})
 
     assert.is_table(coll[_id])
+    assert.oid(tostring(_id))
     assert.is_table(coll[tostring(_id)])
     assert.same(coll[_id], coll[tostring(_id)])
 

@@ -58,7 +58,7 @@ return setmetatable({}, {
     if is.table_with_id(id) then query = {_id = oid(id._id)} end
     if is.oid(id) then query = {_id = oid(id)} end
 
-    if (not query) and type(id)=='string' and #id>0 and not (id=='' or id=='*') and type(self.___)=='table' then
+    if (not query) and type(id)=='string' and #id>0 and not (id=='' or id=='*') and type(self.___)=='table' and not is.oid(id) then
 --      local objs=self.___.objects
       local item=self.___.item
       if type(item)=='table' and (getmetatable(item) or {}).__mod then query=(item % id) end
@@ -79,15 +79,19 @@ return setmetatable({}, {
   __mod = function(self, id)
     local query
     if type(id)=='nil' or id=='' or id=='*' or is.table_empty(id) then query={} end
-    if is.json_object(id) then query=json.decode(id) end
+    if is.json_object(id) then id=json.decode(id) end
     if t.type(id) == 'mongo.ObjectID' then query={_id = id} end
-    if is.table_with_id(id) then query = {_id = oid(id._id)} end
-    if is.oid(id) then query = {_id = oid(id)} end
-    if type(id) == 'table' and is.oid(id._id) then id._id = oid(id._id) end
+    if (not query) and is.table_with_id(id) then query = {_id = oid(id._id)} end
+    if (not query) and is.oid(id) then query = {_id = oid(id)} end
+    if  (not query) and type(id) == 'table' and is.oid(id._id) then id._id = oid(id._id) end
     if (not query) and is.table_no_id(id) then query = id end
 --    if (not query) and is.json_object(id) then query = json.decode(id) end
 --    query=query or {}
-    if query and query._id then query._id=oid(query._id) end
+--    if query and query._id then query._id=oid(query._id) end
+    if (not query) and type(id)=='string' and #id>0 and not (id=='' or id=='*') and type(self.___)=='table' and not is.oid(id) then
+      local item=self.___.item
+      if type(item)=='table' and (getmetatable(item) or {}).__mod then query=(item % id) end
+    end
     return query and self.__:count(query) or 0
   end,
   __name='t/storage/mongo/collection',
@@ -140,11 +144,11 @@ return setmetatable({}, {
       local rv=assert(bulk:execute()) -- t= { "nInserted" : 2, "nMatched" : 0, "nModified" : 0, "nRemoved" : 0, "nUpserted" : 0, "writeErrors" : [  ] }
       return rv and #rv:value().writeErrors==0 or false
     end
-    if type(query)~='table' then return true end
+--    if type(query)~='table' then return true end
     return query and assert(self.__:remove(query)) or nil
   end,
   __tostring=function(self) return type(next(self))~='nil' and assert(self.__):getName() or 't/storage/mongo/collection' end,
   __toboolean=function(self) return tonumber(self)>0 end,
-  __tonumber=function(self) return assert(self.__):count({}) end,
+  __tonumber=function(self) return assert(self.__):count({}) or 0 end,
   __unm=function(self) return assert(self.__:drop()) end,
 })

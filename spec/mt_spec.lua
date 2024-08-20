@@ -5,10 +5,10 @@ describe("collection", function()
     t.env.MONGO_HOST='127.0.0.1'
     is = t.is
     driver = require 'mongo'
-    mongo = require "t.storage.mongo"
+    mongo = assert(require "t.storage.mongo")
     oid = mongo.oid
-    mongo_type = require "t.storage.mongo.type"
-    json = t.format.json
+    mongo_type = assert(require "t.storage.mongo.type")
+    json = assert(t.format.json)
   end)
   it("oid", function()
     local id = '66909d26cbade70b6b022b9a'
@@ -61,7 +61,7 @@ describe("collection", function()
 
     local client = assert(driver.Client('mongodb://localhost'))
     local coll = assert(client:getCollection('test', 'test'))
-    local cursor = tocursor(assert(coll:find({})))
+    local cursor = tocursor(coll:find({}))
 
     assert.equal('userdata', type(cursor))
     assert.equal('mongo.Cursor', t.type(cursor))

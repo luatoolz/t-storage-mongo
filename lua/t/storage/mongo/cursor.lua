@@ -1,5 +1,5 @@
 -- this file is loaded in init.d, so use global "t"
-local t = assert(t)
+local t = t or require"t"
 local iter = assert(require "t.storage.mongo.iter")
 local json = assert(require "t.format.json")
 local getmetatable = debug.getmetatable or getmetatable
