@@ -94,6 +94,7 @@ local db = t.storage.mongo(mongo.conn) or t.storage.mongo
 - `t`
 - `t-env`
 - `t-format-json`
+- `t-format-bson`
 
 ## system depends
 alpine:
