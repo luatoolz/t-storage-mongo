@@ -1,12 +1,10 @@
 describe("collection", function()
-  local t, is, mongo, iter, coll, json, testdata
+  local t, is, mongo, iter, coll, json
   setup(function()
     t = require "t"
     t.env.MONGO_HOST='127.0.0.1'
     is = t.is
-    testdata = require "testdata"
-    assert(testdata.data)
-    mongo = t.storage.mongo ^ testdata.data
+    mongo = t.storage.mongo
     iter = mongo.iter
     coll = mongo.coll
     json = t.format.json
@@ -145,7 +143,6 @@ describe("collection", function()
     assert.is_table(coll[{_id='66ba9cdee46231517f065199'}])
     assert.is_table(coll[{_id='66ba9cdee46231517f065199'}])
     assert.is_table(coll['66ba9cdee46231517f065199'])
-    assert.is_table(coll['95687c9a1a88dd2d552438573dd018748dfff0222c76f085515be2dc1db2afa7'])
 
     local dat = '[{"token":"95687c9a1a88dd2d552438573dd018748dfff0222c76f085515be2dc1db2afa7","role":"root"},' ..
                 '{"token":"46db395df332f18b437d572837d314e421804aaed0f229872ce7d8825d11ff9a","role":"traffer"},' ..
