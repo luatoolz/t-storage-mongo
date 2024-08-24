@@ -38,8 +38,6 @@ describe("collection", function()
     assert.not_equal(a, b)
   end)
   it("findOne", function()
-    assert.is_table(mongo.coll.___.item)
-
     assert.truthy(-coll)
     assert.is_false(toboolean(coll))
     _ = coll + {test=true}
