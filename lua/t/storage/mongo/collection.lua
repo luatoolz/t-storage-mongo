@@ -1,11 +1,17 @@
 local driver = require 'mongo'
 local t = require "t"
 local is = t.is
-local normalize = require "t.storage.mongo.normalize"
 local records = require "t.storage.mongo.records"
 local oid = require "t.storage.mongo.oid"
 local json = t.format.json
 --local inspect = require 'inspect'
+
+local function normalize(self)
+  if type(self)~='table' or getmetatable(self) then return self end
+  if type(self[1])~='nil' then self.__array=true end
+  for k,v in pairs(self) do normalize(v) end
+  return self
+end
 
 return setmetatable({}, {
   __add = function(self, x)
@@ -13,6 +19,7 @@ return setmetatable({}, {
     if is.bulk(x) then return self .. x end
     if is.table.unindexed(x) or getmetatable(x or {}) then
       x._id=oid(x._id)
+      x=normalize(x)
       return assert(self.__:insert(x)) and 1 or false
     end -- TODO: pack table with metatable
     return 0
@@ -26,6 +33,7 @@ return setmetatable({}, {
         if is.json_object(it) then it=json.decode(it) end
         if type(it)=='table' and not is.bulk(it) then
           if it._id then it._id=oid(it._id) end
+          it=normalize(it)
           bulk:insert(it)
         end
       end
@@ -117,7 +125,7 @@ return setmetatable({}, {
       if is.table.unindexed(x) or getmetatable(x or {}) then
         x._id=nil
 -- TODO: pack table with metatable
-        normalize(x)
+        x=normalize(x)
         return assert(self.__:update(query, x, {upsert = true}))
       end
       error(' __newindex wrong argument')
