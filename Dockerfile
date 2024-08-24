@@ -24,7 +24,7 @@ RUN apk add --no-cache \
 RUN luarocks install --dev https://raw.githubusercontent.com/luatoolz/lua-mongo/master/lua-mongo-scm-0.rockspec
 RUN luarocks install --dev t-storage-mongo
 
-RUN apk del build-base gcc git make cmake openssl-dev zlib-dev libmaxminddb-dev && rm -rf /var/cache
+RUN apk del build-base gcc git make cmake openssl-dev && rm -rf /var/cache
 
 FROM scratch
 COPY --from=soft / /
