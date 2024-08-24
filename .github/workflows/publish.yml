@@ -20,7 +20,6 @@ jobs:
     - uses: jkl1337/gh-actions-lua@v11
       with:
         luaVersion: "5.1.5"
-        buildCache: false
     - uses: jkl1337/gh-actions-luarocks@v5
     - name: install upload deps
       run: luarocks install lua-cjson && luarocks install luasec

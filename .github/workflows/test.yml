@@ -22,14 +22,14 @@ jobs:
       ROCKSPEC: ${{ github.event.repository.name }}-scm-0.rockspec
     steps:
     - uses: actions/checkout@master
-    - uses: leafo/gh-actions-lua@v10
+    - name: system dependencies
+      run: sudo apt-get update && sudo apt-get upgrade -y ${{ env.SYSDEPS }}
+    - uses: jkl1337/gh-actions-lua@v11
       with:
         luaVersion: ${{ matrix.luaVersion }}
-    - uses: leafo/gh-actions-luarocks@v4
+    - uses: jkl1337/gh-actions-luarocks@v5
     - name: test deps
       run: luarocks test --prepare ${{ env.DEV }}
-    - name: system dependencies
-      run: sudo apt update -y && sudo apt install -y ${{ env.SYSDEPS }}
     - name: dependencies
       run: luarocks install --deps-mode all --only-deps ${{ env.DEV }} ${{ env.ROCKSPEC }}
     - name: build
