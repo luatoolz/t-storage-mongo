@@ -25,10 +25,9 @@ end
 
 local mt = getmetatable(oid())
 if mt and type(mt.__tojson)=='nil' then
-  mt.__tojson = function(self)
-    return tostring(self)
-  end
-  mt.__toJSON = mt.__tojson
+  mt.__export = tostring
+  mt.__tojson = tostring
+  mt.__toJSON = tostring
   driver.ObjectID = ObjectID
 end
 

@@ -13,6 +13,7 @@ return setmetatable({}, {
     return setmetatable({__=coll.__, coll=coll, query=query}, getmetatable(self))
   end,
   __eq=function(self, to) return t.type(self)==t.type(to) and self.coll and tostring(self.coll)==tostring(to.coll) and is.eq(self.query, to.query) end,
+  __export=function(self) return table.map(iter(self)) end,
 --  __index=function(self, k) return type(k)=='number' and table.map(iter(self))[k] or rawget(self, k) end,
   __iter=function(self, handler) return iter(tocursor(self.__:find(self.query)), handler) end,
   __len=function(self) return tonumber(self) end,

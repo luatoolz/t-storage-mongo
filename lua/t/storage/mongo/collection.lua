@@ -4,6 +4,8 @@ local is = t.is
 local records = require "t.storage.mongo.records"
 local oid = require "t.storage.mongo.oid"
 local json = t.format.json
+local bson = t.format.bson
+local _ = bson
 --local inspect = require 'inspect'
 
 local function normalize(self)

@@ -129,7 +129,6 @@ describe("collection", function()
       ['{"_id":"66ba9cdee46231517f065199","role":"traffer","token":"46db395df332f18b437d572837d314e421804aaed0f229872ce7d8825d11ff9a"}']=true,
       ['{"_id":"66ba9cdee46231517f06519a","role":"panel","token":"60879afb54028243bb82726a5485819a8bbcacd1df738439bfdf06bc3ea628d0"}']=true,
     }
-
     local found = json(coll[{}]):lstrip('['):rstrip(']'):gsub('%}%,%{', '}|{'):split('|')
     assert.same(z, table.tohash(found))
 
