@@ -1,11 +1,13 @@
 describe("client", function()
   local t, mongo
   setup(function()
-    t = require "t"
+    t = assert(require "t", "require: t")
     t.env.MONGO_HOST='127.0.0.1'
     mongo = t.storage.mongo
+    assert(mongo, 'suka')
   end)
   it("env", function()
+    t.env.MONGO_CONNSTRING=nil
     assert.equal('127.0.0.1', t.env.MONGO_HOST)
   end)
   it("connect", function()
@@ -16,6 +18,9 @@ describe("client", function()
     assert.not_nil(mongo)
     assert.equal('t/storage/mongo', t.type(mongo))
     assert.equal('t/storage/mongo', t.type(mongo()))
-    assert.factory(mongo)
+  end)
+  it("connect", function()
+    assert.truthy(mongo())
+    assert.truthy(mongo.auth)
   end)
 end)

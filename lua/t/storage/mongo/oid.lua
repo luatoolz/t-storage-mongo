@@ -1,9 +1,9 @@
 local driver = require 'mongo'
 local oid = driver.ObjectID
-local t = require "t"
+local t = t or require "t"
 local is = t.is
 local json = t.format.json
-local getmetatable = debug.getmetatable or getmetatable
+local getmetatable = debug and debug.getmetatable or getmetatable
 
 local ObjectID = function(x)
   if type(x)=='nil' then return oid() end
@@ -24,10 +24,8 @@ local ObjectID = function(x)
 end
 
 local mt = getmetatable(oid())
-if mt and type(mt.__tojson)=='nil' then
+if mt and type(mt.__export)=='nil' then
   mt.__export = tostring
-  mt.__tojson = tostring
-  mt.__toJSON = tostring
   driver.ObjectID = ObjectID
 end
 

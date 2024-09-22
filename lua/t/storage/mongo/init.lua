@@ -1,35 +1,29 @@
-require "compat53"
-local pkg = (...) or 't.storage.mongo'
+local meta = require "meta"
+local pkg = (...)
 local t = t or require "t"
 local is = t.is ^ 'mongo'
-require "t.storage.mongo.type"
-local driver = assert(require("mongo"))
-require "t.storage.mongo.cursor"
+local cache = meta.cache
+local storage = cache('storage')
+cache.objnormalize.storage = t.module.basename
+local getmetatable = debug and debug.getmetatable or getmetatable
+local setmetatable = debug and debug.setmetatable or setmetatable
 
--- __  = t.storage.mongo.connection
--- ___ = db name
+require(pkg .. ".type")
+require(pkg .. ".cursor")
+
+local connection = require(pkg .. ".connection")
+local client = require(pkg .. ".client")
+
 return t.object({
   __name='t/storage/mongo',
-  __toboolean=function(self) return is.factory(self) and toboolean(self()) or toboolean(driver.Client(tostring(self.__)):getDatabaseNames()) end,
-  __div = function(self, k)
-    if type(k)~='string' or k=='' then return nil end
-    if is.factory(self) then return self()/k end
-    self.___ = k
+  __call=function(self) return setmetatable({}, getmetatable(self)) end,
+  __pow=function(self, to) -- tie storage to container [loader or any indexable]
+    assert(type(to)=='table', ('t.storage.mongo:__pow await table, got %s'):format(type(to)))
+    storage[to]=self
     return self
   end,
-  __call=function(self, conn, db)
-    conn=self.connection(conn)
-    return setmetatable({__=conn, ___=db, __objects=self.__objects}, getmetatable(self))
-  end,
-  __pow=function(self, to) -- tie to objects, loader or any indexable
-    assert(type(to)=='table')
-    self.__objects=to
-    return self
-  end,
+  __toboolean=function(self) return toboolean(client(connection)) end,
 }):postindex(function(self, k)
-  if type(k)~='string' or k=='' or k:match('^__') then return nil end
-  if is.factory(self) then return driver[k] or self()[k] end
-  assert(self.collection, 'require self.collection')
-  return self.collection({conn=self.__, db=self.___, k=k, objects=self.__objects, item=(self.__objects or {})[k]})
-end)
-:loader(pkg):factory()
+  if is.factory(self) then return self()[k] end
+  return (client(connection)/connection.db)[k]
+end):loader(pkg):factory()

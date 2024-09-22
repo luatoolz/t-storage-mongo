@@ -1,56 +1,40 @@
--- this file is loaded in init.d, so use global "t"
 local t = t or require"t"
-local iter = assert(require "t.storage.mongo.iter")
-local json = assert(require "t.format.json")
-local getmetatable = debug.getmetatable or getmetatable
+local getmetatable = debug and debug.getmetatable or getmetatable
 
-return function(cur)
-  if not cur then return cur end
+return function(object)
+  if not object then return object end
+  local mt = getmetatable(object)
+  if mt.__iter then return object end
 
-  local mt = getmetatable(cur)
+  if type(mt.__index)=='table' or type(mt.__index)=='nil' then
+    mt.__index=function(self, key)
+      if type(key)=='string' and #key>0 then
+        return getmetatable(self)[key] end end end
+
   if type(mt.__iter)=='nil' then
     mt.__iter = function(cursor, handler)
-      local ok=true
+      local it, cur = cursor:iterator(handler)
       return function()
-        if not ok then return nil end
-        if not cursor:more() then ok=false end
-        return cursor:value(handler)
+        return it(cur)
       end
     end
   end
-
   if type(mt.__call)=='nil' then
     mt.__call = function(cursor, handler)
-      local ok=true
-      local it = function()
-        if not ok then return nil end
-        if not cursor:more() then ok=false end
-        return cursor:value(handler)
-      end
-      return it()
+      local bson, _ = cursor:next()
+      return bson and bson:value(handler)
     end
   end
-
-  if type(mt.__tojson)=='nil' then
-    mt.__tojson = function(cursor)
-      local jsoner = function(x) return json(x, true) end
-      return table.map(iter(cursor, jsoner) or {})
-    end
-    mt.__toJSON = mt.__tojson
-  end
-
   if type(mt.__export)=='nil' then
     mt.__export = function(cursor)
-      if cursor:more() then
-        return table.map(cursor())
-      end
-      return {}
+      local rv={}
+      while cursor:more() do table.insert(rv, cursor()) end
+      return rv
     end
   end
-
   assert(mt.__iter)
   assert(mt.__call)
-  assert(mt.__tojson)
   assert(mt.__export)
-  return cur
+  assert(type(mt.__index)=='function')
+  return object
 end

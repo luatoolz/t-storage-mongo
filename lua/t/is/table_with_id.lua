@@ -1,1 +1,0 @@
-return function(x) return (type(x)=='table' and type(getmetatable(x))=='nil' and type(x._id)~='nil') and true or false end

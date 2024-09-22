@@ -1,7 +1,10 @@
-local t = require "t"
+local t = t or require "t"
 local is = t.is
 local env = t.env
-local escape = require "t.storage.mongo.escape"
+local pkg = t.match.modbase(...)
+local escape = require(pkg .. ".escape")
+local getmetatable = debug and debug.getmetatable or getmetatable
+local setmetatable = debug and debug.setmetatable or setmetatable
 
 env({
   MONGO_PREFIX='mongodb://',

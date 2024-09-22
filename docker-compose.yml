@@ -13,15 +13,3 @@ services:
       interval: 1s
       timeout: 1s
       retries: 10
-#  mongodb-auth:
-#    image: mongo:latest
-#    read_only: true
-#    restart: no
-#    environment:
-#      MONGO_INITDB_DATABASE: db
-#      MONGO_INITDB_ROOT_USERNAME: admin
-#      MONGO_INITDB_ROOT_PASSWORD: secret
-#    ports:
-#      - 27016:27016
-#    tmpfs:
-#      - /data/db:size=512M,mode=1700
