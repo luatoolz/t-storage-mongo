@@ -88,7 +88,7 @@ local db = t.storage.mongo(mongo.conn) or t.storage.mongo
 - `MONGO_CONNSTRING`
 
 ## depends luarocks
-- ATTENTION: for lua5.1/alpine/mongo install `https://github.com/luatoolz/lua-mongo` instead of `lua-mongo`!
+ATTENTION: for lua5.1/alpine/mongo install `https://github.com/luatoolz/lua-mongo` instead of `lua-mongo`!
 
 - `lua-mongo`
 - `t`
