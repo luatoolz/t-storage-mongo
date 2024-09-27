@@ -3,6 +3,7 @@ describe("client", function()
   setup(function()
     t = assert(require "t", "require: t")
     t.env.MONGO_HOST='127.0.0.1'
+    t.env.MONGO_PORT=27016
     mongo = t.storage.mongo
     assert(mongo, 'suka')
   end)

@@ -3,6 +3,7 @@ describe("connection", function()
   setup(function()
     t = require "t"
     t.env.MONGO_HOST='mongodb'
+    t.env.MONGO_PORT=27017
     is = t.is
     is2 = require "t/is"
     meta = require "meta"
