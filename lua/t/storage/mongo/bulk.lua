@@ -40,14 +40,7 @@ return function(object)
         return getmetatable(self)[key] end end end
 
   mt.__concat = mt.__concat or function(self, it)
-    if is.bulk(it) then
-      for _,v in pairs(it) do
-        if v then
-          local _ = self + v
-        end
-      end
-    end
-    return self
+    if is.bulk(it) then for v in table.iter(it) do if v then _=self+v end end; return self else self:insert(it) end
   end
   mt.__add    = mt.__add or function(self, it)
     if is.bulk(it) then return self .. it end
@@ -55,44 +48,30 @@ return function(object)
     return self
   end
   mt.__sub    = mt.__sub or function(self, it)
-    if is.bulk(it) then
-      for _,v in pairs(it) do
-        if v then
-          local _ = self - v
-        end
-      end
-    else
-      self:removeMany(it)
-    end
+    if is.bulk(it) then for v in table.iter(it) do if v then _=self-v end end; return self else self:removeOne(it) end
     return self
   end
-  local __insert=mt.insert
-  mt.insert   = function(self, it, options) return __insert(self, bson(it), options) end
-  local __removeOne=mt.removeOne
-  mt.removeOne= function(self, it, options)
-    if type(it)=='table' then
-      return __removeOne(self, bson(it), options)
-    end
-  end
-  local __removeMany=mt.removeMany
-  mt.removeMany= function(self, it, options)
-    if type(it)=='table' then
-      return __removeMany(self, bson(it), options)
-    end
-  end
-  local __replaceOne=mt.replaceOne
-  mt.replaceOne= function(self, query, it, options) return __replaceOne(self, query, bson(it), options) end
-  local __updateOne=mt.updateOne
-  mt.updateOne= function(self, query, it, options) return __updateOne(self, query, bson(it), options) end
 
-  local __execute = mt.execute
-  mt.execute  = function(...) return failed( toresult(__execute(...)()) ) end
-  mt.__call   = mt.__call or mt.execute
+  local __insert      = mt.insert
+  local __removeOne   = mt.removeOne
+  local __replaceOne  = mt.replaceOne
+  local __updateOne   = mt.updateOne
+  local __execute     = mt.execute
+  local __removeMany  = mt.removeMany
 
-  assert(type(mt.__call)=='function')
-  assert(type(mt.__add)=='function')
-  assert(type(mt.__sub)=='function')
-  assert(type(mt.__concat)=='function')
-  assert(type(mt.__index)=='function')
+  mt.insert     = function(self, it, options)        return it and __insert     (self, bson(it), options) end
+  mt.removeOne  = function(self, it, options)        return it and __removeOne  (self, bson(it), options) end
+  mt.removeMany = function(self, it, options)        return it and __removeMany (self, bson(it), options) end
+  mt.replaceOne = function(self, query, it, options) return it and __replaceOne (self, query, bson(it), options) end
+  mt.updateOne  = function(self, query, it, options) return it and __updateOne  (self, query, bson(it), options) end
+
+  mt.execute    = function(...) local rv=failed( toresult(__execute(...)) ); if rv then return rv() end end
+  mt.__call     = mt.__call or mt.execute
+
+  assert(type(mt.__call)   == 'function')
+  assert(type(mt.__add)    == 'function')
+  assert(type(mt.__sub)    == 'function')
+  assert(type(mt.__concat) == 'function')
+  assert(type(mt.__index)  == 'function')
   return object
 end

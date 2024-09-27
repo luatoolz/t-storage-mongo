@@ -49,13 +49,10 @@ return function(object)
   end end
 
   mt.__div    = mt.__div or function(self, it) if type(it)=='nil' then it=true end; return self:createBulkOperation{ordered=it} end
-  mt.__concat = mt.__concat or function(self, it)
-    if is.bulk(it) then if #it>0 then return ((self/true):__concat(it)):execute() end; return end;
-    return it and failed(self:insertOne(it))
-  end
-  mt.__add    = mt.__add or function(self, it) if is.bulk(it) then if #it>0 then return ((self/true)..it):execute() end; return end; return it and failed(self:insertOne(it)) end -- document
-  mt.__sub    = mt.__sub or function(self, it) if is.bulk(it) then if #it>0 then return ((self/false)-it):execute() end; return end; return it and failed(self:remove(it)) end -- query
-  mt.__mod    = mt.__mod or function(self, query) return failed(self:count(bson(query or {}))) end
+  mt.__concat = mt.__concat or function(self, it) if is.bulk(it) then if #it>0 then return ((self/true)..it):execute() end; return end; return it and failed(self:insert(it)) end
+  mt.__add    = mt.__add or function(self, it)    if is.bulk(it) then if #it>0 then return ((self/true)..it):execute() end; return end; return it and failed(self:insert(it)) end -- document
+  mt.__sub    = mt.__sub or function(self, it)    if is.bulk(it) then if #it>0 then return ((self/false)-it):execute() end; return end; return it and failed(self:remove(it)) end -- query
+  mt.__mod    = mt.__mod or function(self, query) return failed(self:count(bson(query))) end
   mt.__mul    = mt.__mul or function(self, query) return self:find(query) end
   mt.__unm    = mt.__unm or function(self) return failed(self:drop()) end
   mt.__tostring = mt.__tostring or function(self) return self:getName() end
@@ -70,21 +67,13 @@ return function(object)
   local __find=mt.find
   mt.find = function(self, it, options, prefs) return it and cursor(__find(self, bson(it), options, prefs)) end
   local __insert=mt.insert
-  mt.insert   = function(self, it, options) return it and failed(__insert(self, bson(it or {}), options)) end
+  mt.insert   = function(self, it, options) return it and failed(__insert(self, bson(it), options)) end
   local __insertOne=mt.insertOne
   mt.insertOne   = function(self, it, options) return it and failed(__insertOne(self, bson(it), options)) end
   local __removeOne=mt.removeOne
-  mt.removeOne = function(self, it, options)
-    if type(it)=='table' then
-      return failed(__removeOne(self, bson(it), options))
-    end
-  end
+  mt.removeOne = function(self, it, options) return it and failed(__removeOne(self, bson(it), options)) end
   local __remove=mt.remove
-  mt.remove = function(self, it, options)
-    if type(it)=='table' then
-      return failed(__remove(self, bson(it), options))
-    end
-  end
+  mt.remove = function(self, it, options) return it and failed(__remove(self, bson(it), options)) end
   local __replaceOne=mt.replaceOne
   mt.replaceOne= function(self, query, it, options) return failed(__replaceOne(self, query, bson(it), options)) end
   local __updateOne=mt.updateOne
