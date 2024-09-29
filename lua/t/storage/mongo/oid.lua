@@ -2,6 +2,8 @@ local driver = require 'mongo'
 local oid = driver.ObjectID
 local t = t or require "t"
 local is = t.is
+local pkg = t.match.modbase(...) or 't.storage.mongo'
+local ii = require(pkg .. '.ii')
 local json = t.format.json
 local getmetatable = debug and debug.getmetatable or getmetatable
 
@@ -25,7 +27,7 @@ end
 
 local mt = getmetatable(oid())
 if mt and type(mt.__export)=='nil' then
-  mt.__export = tostring
+  mt.__export = function(self) return {[ii.oid]=tostring(self)} end
   driver.ObjectID = ObjectID
 end
 

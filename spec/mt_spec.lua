@@ -19,7 +19,7 @@ describe("collection", function()
     assert.equal('table', type(t.type))
     assert.equal(mongo_type, t.type)
 
-    assert.equal('mongo.ObjectID', mongo.type(oid(id)) )
+    assert.equal('mongo.ObjectID', mongo_type(oid(id)) )
     assert.is_true(mongo.type(oid(id)) == 'mongo.ObjectID')
     assert.same({_id = driver.ObjectID(id)}, {_id = oid(id)})
   end)

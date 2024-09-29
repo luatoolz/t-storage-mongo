@@ -1,5 +1,5 @@
 local meta = require "meta"
-local pkg = (...)
+local pkg = (...) or "t.storage.mongo"
 local t = t or require "t"
 local is = t.is ^ 'mongo'
 local cache = meta.cache

@@ -5,5 +5,6 @@ return {
     coverage = false,
     recursive = true,
     lpath = "lua/?.lua;lua/?/init.lua;?.lua;?/init.lua;;",
+    ['auto-insulate'] = false,
   }
 }

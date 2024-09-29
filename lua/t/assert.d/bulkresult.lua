@@ -1,0 +1,1 @@
+return {"expected to be bulk result: %s", "expected to be not bulk result: %s"}

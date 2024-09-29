@@ -1,12 +1,13 @@
 local t = t or require "t"
 local is = t.is
+local ok = t.ok
 local getmetatable = debug and debug.getmetatable or getmetatable
-local bson = require "t.format.bson"
-local failed = t.failed
 
 local pkg = t.match.modbase(...)
 local cursor = require(pkg .. ".cursor")
 local bulk = require(pkg .. ".bulk")
+local export = t.exporter
+local ex=function(x) return export(x, true) end
 
 --[[
   [__gc] = function: 0x7f494660c8e0
@@ -44,18 +45,37 @@ return function(object)
   if type(mt.__index)=='nil' then
     mt.__index=mt.__index or function(self, key) if not (type(key)=='table' or (type(key)=='string' and #key>0)) then return nil end
       if type(key)=='string' then return getmetatable(self)[key] end
-      if type(key)=='table' then
-        return self:findOne(bson(key)) end
+      if type(key)=='table' then return ok(self:findOne(ex(key))) end
   end end
 
-  mt.__div    = mt.__div or function(self, it) if type(it)=='nil' then it=true end; return self:createBulkOperation{ordered=it} end
-  mt.__concat = mt.__concat or function(self, it) if is.bulk(it) then if #it>0 then return ((self/true)..it):execute() end; return end; return it and failed(self:insert(it)) end
-  mt.__add    = mt.__add or function(self, it)    if is.bulk(it) then if #it>0 then return ((self/true)..it):execute() end; return end; return it and failed(self:insert(it)) end -- document
-  mt.__sub    = mt.__sub or function(self, it)    if is.bulk(it) then if #it>0 then return ((self/false)-it):execute() end; return end; return it and failed(self:remove(it)) end -- query
-  mt.__mod    = mt.__mod or function(self, query) return failed(self:count(bson(query))) end
-  mt.__mul    = mt.__mul or function(self, query) return self:find(query) end
-  mt.__unm    = mt.__unm or function(self) return failed(self:drop()) end
+  mt.__div    = mt.__div or function(self, it) if type(it)~='boolean' then it=true end; return bulk(self:createBulkOperation{ordered=it}) end
+  mt.__concat = mt.__concat or function(self, x) if type(x)=='nil' then return end
+    local it=ex(x)
+    if type(it)~='table' then return end
+
+    if (not(is.bulk(it))) then return ok(self:insert(it)) end
+    if #it>0 then return ((self/true)..it)() end
+  end
+  mt.__add    = mt.__add or function(self, x) if type(x)=='nil' then return end
+    local it=ex(x)
+    if type(it)~='table' then return end
+    if (not(is.bulk(it))) then return ok(self:insert(it)) end
+    if #it>0 then return ((self/true)+it)() end
+  end
+  mt.__sub    = mt.__sub or function(self, x) if type(x)=='nil' then return end
+    local it=ex(x)
+    if type(it)~='table' then return end
+    if (not(is.bulk(it))) then return ok(self:remove(it)) end
+    if #it>0 then return ((self/true)-it)() end
+  end
+  mt.__mod    = mt.__mod or function(self, q) q=ex(q); q=is.table(q) and q or {}; return ok(self:count(q)) end
+  mt.__mul    = mt.__mul or function(self, q) q=ex(q); if is.table(q) then return cursor(self:find(q)) end end
+
+  mt.__unm    = mt.__unm or function(self) return ok(self:drop()) end
+  mt.__len    = mt.__len or function(self) return ok(self:count({})) end
   mt.__tostring = mt.__tostring or function(self) return self:getName() end
+
+--[[
   mt.__newindex = mt.__newindex or function(self, query, it)
     if type(query)=='nil' then return self + it end
     if is.bulk(query) then
@@ -63,32 +83,16 @@ return function(object)
     end
     if it then self:updateOne(query, it) end
   end
-
-  local __find=mt.find
-  mt.find = function(self, it, options, prefs) return it and cursor(__find(self, bson(it), options, prefs)) end
-  local __insert=mt.insert
-  mt.insert   = function(self, it, options) return it and failed(__insert(self, bson(it), options)) end
-  local __insertOne=mt.insertOne
-  mt.insertOne   = function(self, it, options) return it and failed(__insertOne(self, bson(it), options)) end
-  local __removeOne=mt.removeOne
-  mt.removeOne = function(self, it, options) return it and failed(__removeOne(self, bson(it), options)) end
-  local __remove=mt.remove
-  mt.remove = function(self, it, options) return it and failed(__remove(self, bson(it), options)) end
-  local __replaceOne=mt.replaceOne
-  mt.replaceOne= function(self, query, it, options) return failed(__replaceOne(self, query, bson(it), options)) end
-  local __updateOne=mt.updateOne
-  mt.updateOne= function(self, query, it, options) return failed(__updateOne(self, query, bson(it), options)) end
-  local __createBulkOperation=mt.createBulkOperation
-  mt.createBulkOperation = function(self, ...) return bulk(__createBulkOperation(self, ...)) end
+--]]
 
   assert(mt.__add)
   assert(mt.__sub)
   assert(mt.__concat)
 --  assert(mt.__tonumber)
---  assert(mt.__len)
+  assert(mt.__len)
   assert(mt.__mod)
   assert(mt.__unm)
-  assert(mt.__newindex)
+--  assert(mt.__newindex)
   assert(mt.__index)
   assert(mt.__tostring)
   return object
