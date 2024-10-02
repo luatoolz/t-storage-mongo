@@ -37,8 +37,8 @@ jobs:
     - name: docker compose up
       run: docker compose up -d --wait --wait-timeout 10 --no-log-prefix
     - name: docker logs
-      run: docker compose logs && docker compose ps
+      run: docker compose logs && docker compose ps && ldd `find /usr -name mongo.so | head`
     - name: test
-      run: luarocks test -- -o TAP
+      run: luarocks test -- -o TAP --no-auto-insulate
     - name: docker compose down
       run: docker compose down --remove-orphans -v
