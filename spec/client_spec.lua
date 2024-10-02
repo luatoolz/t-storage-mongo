@@ -9,6 +9,7 @@ describe("client", function()
   it("env", function()
     t.env.MONGO_CONNSTRING=nil
     assert.equal('127.0.0.1', t.env.MONGO_HOST)
+    assert.equal('27016', t.env.MONGO_PORT)
   end)
   it("connect", function()
     assert.is_true(toboolean(mongo))

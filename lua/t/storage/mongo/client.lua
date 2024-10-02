@@ -1,6 +1,6 @@
-local t = t or require"t"
+local t = assert(t or require"t", 'no t')
 local getmetatable = debug and debug.getmetatable or getmetatable
-local driver = assert(require 'mongo')
+local driver = assert(require 'mongo', 'no mongo driver')
 local pkg = t.match.modbase(...)
 local done
 

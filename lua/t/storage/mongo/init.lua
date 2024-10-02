@@ -11,8 +11,8 @@ local setmetatable = debug and debug.setmetatable or setmetatable
 require(pkg .. ".type")
 require(pkg .. ".cursor")
 
-local connection = require(pkg .. ".connection")
-local client = require(pkg .. ".client")
+local connection = assert(require(pkg .. ".connection"))
+local client = assert(require(pkg .. ".client"))
 
 return t.object({
   __name='t/storage/mongo',
