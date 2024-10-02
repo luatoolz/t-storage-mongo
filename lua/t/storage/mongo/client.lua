@@ -1,6 +1,6 @@
 local t = t or require"t"
 local getmetatable = debug and debug.getmetatable or getmetatable
-local driver = require 'mongo'
+local driver = assert(require 'mongo')
 local pkg = t.match.modbase(...)
 local done
 
@@ -36,7 +36,7 @@ local function fix_client_meta(object)
       return getmetatable(self)[key] or collection(database(self:getDefaultDatabase()):getCollection(key))
   end end
 
-  mt.__toboolean = mt.__toboolean or function(self) return toboolean(self:getDatabaseNames()) end
+  mt.__toboolean = mt.__toboolean or function(self) return toboolean(assert(self:getDatabaseNames())) end
   mt.__div  = mt.__div or function(self, key) return database(self:getDatabase(key)) end
   mt.__call = mt.__call or function(self, dbname, collname) return collection(self:getCollection(dbname, collname)) end
 
@@ -50,6 +50,6 @@ end
 
 return function(conn)
   conn=conn or connection
-  if not done then return fix_client_meta(Client(conn)) end
-  return Client(conn)
+  if not done then return fix_client_meta(assert(Client(conn))) end
+  return assert(Client(conn))
 end
