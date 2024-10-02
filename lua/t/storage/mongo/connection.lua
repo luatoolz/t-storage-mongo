@@ -82,6 +82,7 @@ return t.object({
   user    = function(self) if next(self)==nil then return env.MONGO_USER end end,
   pass    = function(self) if next(self)==nil then return escape(env.MONGO_PASS) end end,
   options = function(self) return (env.MONGO_OPTIONS or ''):lstrip('?'):null() end,
+}):computed({
   connstring=function(self)
     local cred = join(':', self.user, self.pass)
     local host = self.hosts and table.concat(self.hosts, ','):null() or join(':', self.host, self.port)
