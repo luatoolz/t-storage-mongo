@@ -1,7 +1,7 @@
-local t = t or require "t"
-local is = t.is
-local ok = t.ok
-local pkg = t.pkg(...)
+local t=t or require "t"
+local is=t.is
+local ok=t.ok
+local pkg=t.pkg(...)
 
 local cursor, bulk = pkg.cursor, pkg.bulk
 local export = t.exporter

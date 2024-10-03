@@ -1,5 +1,5 @@
-local t = t or require "t"
-local pkg = t.pkg(...)
+local t=t or require "t"
+local pkg=t.pkg(...)
 
 local collection = pkg.collection
 local ok = t.ok

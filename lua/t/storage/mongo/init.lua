@@ -2,10 +2,12 @@ local meta = require "meta"
 local t = t or require "t"
 local is = t.is ^ 'mongo'
 local pkg = t.pkg((...) or 't.storage.mongo')
+local bson = t.format.bson
 local cache = meta.cache
 local storage = cache('storage')
 cache.objnormalize.storage = t.pkgname
 
+assert(bson)
 assert(pkg.type)
 assert(pkg.cursor)
 

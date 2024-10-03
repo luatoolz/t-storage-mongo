@@ -1,4 +1,4 @@
-local t = t or require"t"
+local t=t or require"t"
 
 return function(object)
   if not object then return object end

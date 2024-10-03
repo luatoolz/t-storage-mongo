@@ -1,6 +1,6 @@
-local t = t or require"t"
-local is = t.is
-local pkg = t.pkg(...)
+local t=t or require"t"
+local is=t.is
+local pkg=t.pkg(...)
 
 local bulkresult = pkg.bulkresult
 local ok = t.ok

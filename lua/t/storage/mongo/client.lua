@@ -1,6 +1,6 @@
-local t = t or require "t"
+local t=t or require "t"
 local driver = require 'mongo'
-local pkg = t.pkg(...)
+local pkg=t.pkg(...)
 
 local connection, database, collection =
   pkg.connection, pkg.database, pkg.collection
