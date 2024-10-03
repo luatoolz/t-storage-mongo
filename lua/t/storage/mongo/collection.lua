@@ -51,19 +51,19 @@ return function(object)
     local it=ex(x)
     if type(it)~='table' then return end
 
-    if (not(is.bulk(it))) then return ok(self:insert(it)) end
+    if not is.bulk(it) then return ok(self:insert(it)) end
     if #it>0 then return ((self/true)..it)() end
   end
   mt.__add    = mt.__add or function(self, x) if type(x)=='nil' then return end
     local it=ex(x)
     if type(it)~='table' then return end
-    if (not(is.bulk(it))) then return ok(self:insert(it)) end
+    if not is.bulk(it) then return ok(self:insert(it)) end
     if #it>0 then return ((self/true)+it)() end
   end
   mt.__sub    = mt.__sub or function(self, x) if type(x)=='nil' then return end
     local it=ex(x)
     if type(it)~='table' then return end
-    if (not(is.bulk(it))) then return ok(self:remove(it)) end
+    if not is.bulk(it) then return ok(self:remove(it)) end
     if #it>0 then return ((self/true)-it)() end
   end
   mt.__mod    = mt.__mod or function(self, q) q=ex(q); q=is.table(q) and q or {}; return ok(self:count(q)) end

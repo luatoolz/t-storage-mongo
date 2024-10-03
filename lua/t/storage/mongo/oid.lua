@@ -26,7 +26,7 @@ end
 
 local mt = getmetatable(oid())
 if mt and type(mt.__export)=='nil' then
-  mt.__export = function(self) return {[ii.oid]=tostring(self)} end
+  mt.__export = function(self, full) return full==false and tostring(self) or {[ii.oid]=tostring(self)} end
   driver.ObjectID = ObjectID
 end
 
