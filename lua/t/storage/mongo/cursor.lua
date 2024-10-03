@@ -1,10 +1,9 @@
 local t = t or require"t"
-local getmetatable = debug and debug.getmetatable or getmetatable
 
 return function(object)
   if not object then return object end
   local mt = getmetatable(object)
-  if mt.__iter then return object end
+  if (not mt) or mt.__iter then return object end
 
   if type(mt.__index)=='table' or type(mt.__index)=='nil' then
     mt.__index=function(self, key)

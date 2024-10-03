@@ -1,11 +1,9 @@
 local t = t or require "t"
 local is = t.is
 local ok = t.ok
-local getmetatable = debug and debug.getmetatable or getmetatable
+local pkg = t.pkg(...)
 
-local pkg = t.match.modbase(...)
-local cursor = require(pkg .. ".cursor")
-local bulk = require(pkg .. ".bulk")
+local cursor, bulk = pkg.cursor, pkg.bulk
 local export = t.exporter
 local ex=function(x) return export(x, true) end
 
@@ -39,7 +37,7 @@ local ex=function(x) return export(x, true) end
 return function(object)
   if not object then return object end
   local mt = getmetatable(object)
-  if mt.__add then return object end
+  if (not mt) or mt.__add then return object end
 
   if type(mt.__index)=='table' then mt.__index=nil end
   if type(mt.__index)=='nil' then

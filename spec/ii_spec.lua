@@ -1,6 +1,9 @@
 describe("ii", function()
-  local t, export, oid, ii
+  local meta, t, export, oid, ii
   setup(function()
+    meta = require "meta"
+    meta.log.report=true
+    meta.errors(true)
     t = require "t"
     export = t.exporter
     oid = t.storage.mongo.oid

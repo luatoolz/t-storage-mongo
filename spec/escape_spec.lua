@@ -1,6 +1,9 @@
 describe("escape/unescape", function()
-  local t, escape, unescape
+  local meta, t, escape, unescape
   setup(function()
+    meta = require "meta"
+    meta.log.report=true
+    meta.errors(true)
     t = require "t"
     escape = t.storage.mongo.escape
     unescape = t.storage.mongo.unescape

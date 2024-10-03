@@ -1,7 +1,8 @@
 local t = t or require "t"
-local getmetatable = debug and debug.getmetatable or getmetatable
-local pkg = t.match.modbase(...)
-local collection = require(pkg .. ".collection")
+local pkg = t.pkg(...)
+
+local collection = pkg.collection
+local ok = t.ok
 
 --[[
   [__gc] = function: 0x7efcca87f7c0
@@ -23,14 +24,15 @@ local collection = require(pkg .. ".collection")
 return function(object)
   if not object then return object end
   local mt = getmetatable(object)
-  if mt.__unm then return object end
+  if (not mt) or mt.__unm then return object end
 
   if type(mt.__index)=='table' then mt.__index=nil end
-  if type(mt.__index)=='nil' then
-    mt.__index=function(self, key) if type(key)~='string' or #key==0 then return nil end
-      return getmetatable(self)[key] or collection(self:getCollection(key))
-  end end
-  mt.__unm = mt.__unm or function(self) return self:drop() end
+
+  mt.__index = mt.__index or function(self, key)
+    if type(key)~='string' or #key==0 then return nil end
+    return getmetatable(self)[key] or collection(self:getCollection(key))
+  end
+  mt.__unm = mt.__unm or function(self) return ok(self:drop()) end
 
   assert(type(mt.__unm)=='function')
   assert(type(mt.__index)=='function')

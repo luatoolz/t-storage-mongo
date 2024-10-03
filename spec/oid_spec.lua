@@ -1,6 +1,9 @@
 describe("oid", function()
-  local t, is, oid
+  local meta, t, is, oid
   setup(function()
+    meta = require "meta"
+    meta.log.report=true
+    meta.errors(true)
     t = require "t"
     is = t.is
     oid = is.oid

@@ -1,6 +1,9 @@
 describe("connection", function()
-  local t, is, is2, mongo, mongo2, mongo3, meta, connection1, connection2
+  local meta, t, is, is2, mongo, mongo2, mongo3, connection1, connection2
   setup(function()
+    meta = require "meta"
+    meta.log.report=true
+    meta.errors(true)
     t = require "t"
     t.env.MONGO_HOST='mongodb'
     t.env.MONGO_PORT=27017

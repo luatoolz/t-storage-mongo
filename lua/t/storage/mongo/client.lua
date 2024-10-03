@@ -1,15 +1,9 @@
-local t = assert(t or require"t", 'no t')
-local getmetatable = debug and debug.getmetatable or getmetatable
-local driver = assert(require 'mongo', 'no mongo driver')
-local pkg = t.match.modbase(...)
-local done
+local t = t or require "t"
+local driver = require 'mongo'
+local pkg = t.pkg(...)
 
-local connection = require(pkg .. ".connection")
-local database   = require(pkg .. ".database")
-local collection = require(pkg .. ".collection")
-
-local Client = function(conn)
-  return driver.Client(conn and tostring(conn) or conn) end
+local connection, database, collection =
+  pkg.connection, pkg.database, pkg.collection
 
 --[[
   [__gc] = function: 0x7feede3c2420
@@ -28,7 +22,7 @@ local Client = function(conn)
 local function fix_client_meta(object)
   if not object then return object end
   local mt = getmetatable(object)
-  if mt.__div then return object end
+  if (not mt) or mt.__div then return object end
 
   if type(mt.__index)=='table' then mt.__index=nil end
   if type(mt.__index)=='nil' then
@@ -44,12 +38,9 @@ local function fix_client_meta(object)
   assert(type(mt.__div)=='function')
   assert(type(mt.__index)=='function')
   assert(type(mt.__toboolean)=='function')
-  done=true
   return object
 end
 
 return function(conn)
-  conn=conn or connection
-  if not done then return fix_client_meta(assert(Client(conn))) end
-  return assert(Client(conn))
+  return fix_client_meta(driver.Client(tostring(conn or connection)))
 end

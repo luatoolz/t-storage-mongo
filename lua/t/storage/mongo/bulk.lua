@@ -1,15 +1,14 @@
 local t = t or require"t"
 local is = t.is
-local ok = t.ok
-local getmetatable = debug and debug.getmetatable or getmetatable
+local pkg = t.pkg(...)
 
-local pkg = t.match.modbase(...)
-local bulkresult = require(pkg .. ".bulkresult")
+local bulkresult = pkg.bulkresult
+local ok = t.ok
 
 return function(object)
   if not object then return object end
   local mt = getmetatable(object)
-  if mt.__add then return object end
+  if (not mt) or mt.__add then return object end
 
   if type(mt.__index)=='table' or type(mt.__index)=='nil' then
     mt.__index=function(self, key)
@@ -46,7 +45,6 @@ return function(object)
     end
     return self
   end
-
   mt.__call     = mt.__call or function(self, ...) return bulkresult(ok(self:execute(...))) end
 
   assert(type(mt.__call)   == 'function')

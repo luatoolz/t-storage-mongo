@@ -1,10 +1,9 @@
 local t = t or require "t"
 local is = t.is
 local env = t.env
-local pkg = t.match.modbase(...) or 't.storage.mongo'
-local escape = assert(require(pkg .. ".escape"))
-local getmetatable = debug and debug.getmetatable or getmetatable
-local setmetatable = debug and debug.setmetatable or setmetatable
+local pkg = t.pkg(...)
+
+local escape = pkg.escape
 
 env({
   MONGO_PREFIX='mongodb://',
@@ -82,7 +81,6 @@ return t.object({
   user    = function(self) if next(self)==nil then return env.MONGO_USER end end,
   pass    = function(self) if next(self)==nil then return escape(env.MONGO_PASS) end end,
   options = function(self) return (env.MONGO_OPTIONS or ''):lstrip('?'):null() end,
-}):computed({
   connstring=function(self)
     local cred = join(':', self.user, self.pass)
     local host = self.hosts and table.concat(self.hosts, ','):null() or join(':', self.host, self.port)

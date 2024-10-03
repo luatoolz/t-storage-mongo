@@ -1,7 +1,10 @@
 local getmetatable=debug and debug.getmetatable or getmetatable
 describe("collection", function()
-  local t, mongo, driver, oid, mongo_type, json
+  local meta, t, mongo, driver, oid, mongo_type, json
   setup(function()
+    meta = require "meta"
+    meta.log.report=true
+    meta.errors(true)
     t = require "t"
     t.env.MONGO_HOST='127.0.0.1'
     driver = require 'mongo'

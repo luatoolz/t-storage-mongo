@@ -1,11 +1,10 @@
-local driver = require 'mongo'
-local oid = driver.ObjectID
 local t = t or require "t"
 local is = t.is
-local pkg = t.match.modbase(...) or 't.storage.mongo'
-local ii = require(pkg .. '.ii')
+local driver = require 'mongo'
+local oid = driver.ObjectID
+local pkg = t.pkg(...)
+local ii = pkg.ii
 local json = t.format.json
-local getmetatable = debug and debug.getmetatable or getmetatable
 
 local ObjectID = function(x)
   if type(x)=='nil' then return oid() end

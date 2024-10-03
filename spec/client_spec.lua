@@ -1,6 +1,9 @@
 describe("client", function()
-  local t, mongo
+  local meta, t, mongo
   setup(function()
+    meta = require "meta"
+    meta.log.report=true
+    meta.errors(true)
     t = assert(require "t", "require: t")
     t.env.MONGO_HOST='127.0.0.1'
     t.env.MONGO_PORT=27016
