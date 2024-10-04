@@ -39,6 +39,7 @@ describe("client", function()
       }
     }))
     assert.equal('{ "numIndexesBefore" : 1, "numIndexesAfter" : 2, "createdCollectionAutomatically" : false, "ok" : 1.0 }', tostring(r))
+    assert.is_nil(e)
     _ = -data
 -- https://www.mongodb.com/docs/manual/core/indexes/create-index/specify-index-name/
 -- https://www.mongodb.com/docs/manual/reference/command/createIndexes/#mongodb-dbcommand-dbcmd.createIndexes
