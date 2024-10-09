@@ -1,0 +1,11 @@
+return {
+  'MONGO_PREFIX',
+  'MONGO_HOST',
+  'MONGO_PORT',
+  'MONGO_DB',
+  'MONGO_USER',
+  'MONGO_PASS',
+  'MONGO_DB',
+  'MONGO_OPTIONS',
+  'MONGO_CONNSTRING',
+}

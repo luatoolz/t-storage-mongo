@@ -5,7 +5,7 @@ local pkg = t.pkg((...) or 't.storage.mongo')
 local bson = t.format.bson
 local cache = meta.cache
 local storage = cache('storage')
-cache.objnormalize.storage = t.pkgname
+cache.objnormalize.storage = t.pkg.name
 
 assert(bson)
 assert(pkg.type)
