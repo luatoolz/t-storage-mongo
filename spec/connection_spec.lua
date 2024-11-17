@@ -1,9 +1,6 @@
 describe("connection", function()
-  local meta, t, is, is2, mongo, mongo2, mongo3, connection1, connection2
+  local t, is, is2, mongo, mongo2, mongo3, connection1, connection2
   setup(function()
-    meta = require "meta"
-    meta.log.report=true
-    meta.errors(true)
     t = require "t"
     t.env.MONGO_HOST='mongodb'
     t.env.MONGO_PORT=27017
@@ -15,7 +12,6 @@ describe("connection", function()
     mongo = t.storage.mongo
     mongo2 = require "t.storage.mongo"
     mongo3 = require "t/storage/mongo"
-
     connection1 = mongo.connection
     connection2 = require "t.storage.mongo.connection"
   end)
@@ -33,17 +29,17 @@ describe("connection", function()
     assert.equal(mongo2, mongo3)
     assert.equal(mongo3, mongo)
 
-    assert.equal('t/storage/mongo', t.type(mongo))
-    assert.equal('t/storage/mongo', t.type(mongo2))
-    assert.equal('t/storage/mongo', t.type(mongo3))
+    assert.equal('storage/mongo', t.type(mongo))
+    assert.equal('storage/mongo', t.type(mongo2))
+    assert.equal('storage/mongo', t.type(mongo3))
 
-    assert.equal('t/storage/mongo', cache.type[mongo])
-    assert.equal('t/storage/mongo', cache.type[mongo2])
-    assert.equal('t/storage/mongo', cache.type[mt(mongo2)])
-    assert.equal('t/storage/mongo', cache.type[cache.instance[mongo3]])
+    assert.equal('storage/mongo', cache.type[mongo])
+    assert.equal('storage/mongo', cache.type[mongo2])
+    assert.equal('storage/mongo', cache.type[mt(mongo2)])
+    assert.equal('storage/mongo', cache.type[cache.instance[mongo3]])
 
-    assert.equal('t/storage/mongo/connection', t.type(connection1))
-    assert.equal('t/storage/mongo/connection', t.type(connection2))
+    assert.equal('storage/mongo/connection', t.type(connection1))
+    assert.equal('storage/mongo/connection', t.type(connection2))
     assert.equal(getmetatable(connection2), getmetatable(connection1))
     assert.equal(connection2, connection1)
     assert.is_nil(mongo.connection.noneexistent)

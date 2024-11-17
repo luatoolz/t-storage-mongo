@@ -1,9 +1,6 @@
 describe("loading", function()
-  local meta, t, is, storage, mongo, driver
+  local t, is, storage, mongo, driver
   setup(function()
-    meta = require "meta"
-    meta.log.report=true
-    meta.errors(true)
     t = require "t"
     is = t.is
     t.env.MONGO_HOST='127.0.0.1'

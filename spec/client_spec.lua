@@ -1,13 +1,11 @@
 describe("client", function()
-  local meta, t, mongo
+  local t, mongo, to
   setup(function()
-    meta = require "meta"
-    meta.log.report=true
-    meta.errors(true)
-    t = assert(require "t", "require: t")
+    t = require "t"
     t.env.MONGO_HOST='127.0.0.1'
     t.env.MONGO_PORT=27016
     mongo = t.storage.mongo
+    to = t.to
   end)
   it("env", function()
     t.env.MONGO_CONNSTRING=nil
@@ -15,13 +13,13 @@ describe("client", function()
     assert.equal('27016', t.env.MONGO_PORT)
   end)
   it("connect", function()
-    assert.is_true(toboolean(mongo))
-    assert.is_true(toboolean(mongo()))
+    assert.is_true(to.boolean(mongo))
+    assert.is_true(to.boolean(mongo()))
   end)
   it("create", function()
     assert.not_nil(mongo)
-    assert.equal('t/storage/mongo', t.type(mongo))
-    assert.equal('t/storage/mongo', t.type(mongo()))
+    assert.equal('storage/mongo', t.type(mongo))
+    assert.equal('storage/mongo', t.type(mongo()))
   end)
   it("connect", function()
     assert.truthy(mongo())
@@ -31,7 +29,7 @@ describe("client", function()
     local data = mongo.data
     _ = -data
     _ = data + {x='x'}
-    local client = mongo().client
+    local client = mongo()._client
     local r,e = assert(client:command('db', {createIndexes='data'},
       {indexes={
         __array=true,

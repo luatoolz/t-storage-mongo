@@ -1,6 +1,5 @@
 local t=t or require "t"
-local is=t.is
-local ok=t.ok
+local is, ok = t.is, t.ok
 local pkg=t.pkg(...)
 
 local cursor, bulk = pkg.cursor, pkg.bulk
@@ -43,7 +42,12 @@ return function(object)
   if type(mt.__index)=='nil' then
     mt.__index=mt.__index or function(self, key) if not (type(key)=='table' or (type(key)=='string' and #key>0)) then return nil end
       if type(key)=='string' then return getmetatable(self)[key] end
-      if type(key)=='table' then return ok(self:findOne(ex(key))) end
+      if type(key)=='table' and key._id then
+        local rv=self:findOne(ex(key))
+        if type(rv)=='userdata' then return rv:value() end
+        return ok(rv)
+      end
+      if type(key)=='table' then return cursor(self:find(ex(key))) end
   end end
 
   mt.__div    = mt.__div or function(self, it) if type(it)~='boolean' then it=true end; return bulk(self:createBulkOperation{ordered=it}) end
@@ -51,14 +55,14 @@ return function(object)
     local it=ex(x)
     if type(it)~='table' then return end
 
-    if not is.bulk(it) then return ok(self:insert(it)) end
+    if not is.bulk(it) then return ok(self:insert(it), {continueOnError=true}) end
     if #it>0 then return ((self/true)..it)() end
   end
   mt.__add    = mt.__add or function(self, x) if type(x)=='nil' then return end
     local it=ex(x)
     if type(it)~='table' then return end
-    if not is.bulk(it) then return ok(self:insert(it)) end
-    if #it>0 then return ((self/true)+it)() end
+    if not is.bulk(it) then return ok(self:insert(it), {continueOnError=true}) end
+    if #it>0 then return ((self/true)..it)() end
   end
   mt.__sub    = mt.__sub or function(self, x) if type(x)=='nil' then return end
     local it=ex(x)
@@ -73,24 +77,20 @@ return function(object)
   mt.__len    = mt.__len or function(self) return ok(self:count({})) end
   mt.__tostring = mt.__tostring or function(self) return self:getName() end
 
---[[
-  mt.__newindex = mt.__newindex or function(self, query, it)
-    if type(query)=='nil' then return self + it end
-    if is.bulk(query) then
-      return
-    end
-    if it then self:updateOne(query, it) end
+  mt.__newindex = mt.__newindex or function(self, q, it)
+    if type(q)=='nil' then return self + it end
+    if is.bulk(q) or not q then return end
+    if type(it)=='nil' then self:remove(ex(q)) end
+    if type(it)=='table' then self:update(ex(q), ex(it), {upsert=true}) end
   end
---]]
 
   assert(mt.__add)
   assert(mt.__sub)
   assert(mt.__concat)
---  assert(mt.__tonumber)
   assert(mt.__len)
   assert(mt.__mod)
   assert(mt.__unm)
---  assert(mt.__newindex)
+  assert(mt.__newindex)
   assert(mt.__index)
   assert(mt.__tostring)
   return object

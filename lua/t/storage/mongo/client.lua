@@ -1,6 +1,7 @@
 local t=t or require "t"
 local driver = require 'mongo'
 local pkg=t.pkg(...)
+local to=t.to
 
 local connection, database, collection =
   pkg.connection, pkg.database, pkg.collection
@@ -30,7 +31,7 @@ local function fix_client_meta(object)
       return getmetatable(self)[key] or collection(database(self:getDefaultDatabase()):getCollection(key))
   end end
 
-  mt.__toboolean = mt.__toboolean or function(self) return toboolean(assert(self:getDatabaseNames())) end
+  mt.__toboolean = mt.__toboolean or function(self) return to.boolean(assert(self:getDatabaseNames())) end
   mt.__div  = mt.__div or function(self, key) return database(self:getDatabase(key)) end
   mt.__call = mt.__call or function(self, dbname, collname) return collection(self:getCollection(dbname, collname)) end
 

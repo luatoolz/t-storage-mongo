@@ -1,16 +1,12 @@
-local getmetatable=debug and debug.getmetatable or getmetatable
 describe("collection", function()
-  local meta, t, mongo, driver, oid, mongo_type, json
+  local t, mongo, driver, oid, mongo_type, json
   setup(function()
-    meta = require "meta"
-    meta.log.report=true
-    meta.errors(true)
     t = require "t"
     t.env.MONGO_HOST='127.0.0.1'
     driver = require 'mongo'
-    mongo = assert(require "t.storage.mongo")
+    mongo = t.storage.mongo
     oid = mongo.oid
-    mongo_type = assert(require "t.storage.mongo.type")
+    mongo_type = t.storage.mongo.type
     json = assert(t.format.json)
   end)
   it("oid", function()

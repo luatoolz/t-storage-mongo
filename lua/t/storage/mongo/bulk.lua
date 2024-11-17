@@ -1,7 +1,9 @@
-local t=t or require"t"
+local t=t or require "t"
 local is=t.is
+local iter=table.iter
 local pkg=t.pkg(...)
-
+local export = t.exporter
+local ex=function(x) return export(x, true) end
 local bulkresult = pkg.bulkresult
 local ok = t.ok
 
@@ -16,33 +18,25 @@ return function(object)
         return getmetatable(self)[key] end end end
 
   mt.__concat = mt.__concat or function(self, it)
+    it=ex(it)
     if is.bulk(it) then
-      for v in table.iter(it) do
-        self:insert(v)
-      end
-    else
-      self:insert(it)
-    end
+      for v in iter(it) do
+        self:insert(v) end
+    else self:insert(it) end
     return self
   end
-  mt.__add    = mt.__add or function(self, it)
+  mt.__add    = mt.__add or function(self, it) it=ex(it)
     if is.bulk(it) then
-      for v in table.iter(it) do
-        self:insert(v)
-      end
-    else
-      self:insert(it)
-    end
+      for v in iter(it) do
+        self:insert(v) end
+    else self:insert(it) end
     return self
   end
-  mt.__sub    = mt.__sub or function(self, it)
+  mt.__sub    = mt.__sub or function(self, it) it=ex(it)
     if is.bulk(it) then
-      for v in table.iter(it) do
-        self:removeOne(v)
-      end
-    else
-      self:removeOne(it)
-    end
+      for v in iter(it) do
+        self:removeOne(v) end
+    else self:removeOne(it) end
     return self
   end
   mt.__call     = mt.__call or function(self, ...) return bulkresult(ok(self:execute(...))) end

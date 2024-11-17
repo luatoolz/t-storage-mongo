@@ -1,9 +1,6 @@
 describe("ii", function()
-  local meta, t, export, oid, ii
+  local t, export, oid, ii
   setup(function()
-    meta = require "meta"
-    meta.log.report=true
-    meta.errors(true)
     t = require "t"
     export = t.exporter
     oid = t.storage.mongo.oid
@@ -19,7 +16,7 @@ describe("ii", function()
     assert.equal(id, t.match.oid(id))
     assert.oid(id)
     local moid = oid(id)
-    assert.oid(moid)
+    assert.oid(tostring(moid))
     assert.equal(moid, oid(export(moid)))
     assert.same({[ii.oid]=id}, export(moid))
     assert.equal(moid, oid({[ii.oid]=id}))

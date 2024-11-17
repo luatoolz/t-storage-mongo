@@ -1,15 +1,19 @@
 describe("oid", function()
-  local meta, t, is, oid
+  local t, is, oid
   setup(function()
-    meta = require "meta"
-    meta.log.report=true
-    meta.errors(true)
     t = require "t"
     is = t.is
     oid = is.oid
   end)
   it("matcher", function()
-    assert.equal(t.match.oid, oid)
+    assert.is_true(oid('66909d26cbade70b6b022b9a'))
+    assert.equal('66909d26cbade70b6b022b9a', t.match.oid('66909d26cbade70b6b022b9a'))
+    assert.is_nil(t.match.oid(''))
+    assert.is_nil(t.match.oid('a'))
+    assert.is_nil(t.match.oid('66909d26cbade70b6b022b9aa'))
+    assert.is_nil(t.match.oid('66909d26cbade70b6b022b9g'))
+    assert.is_nil(t.match.oid())
+    assert.is_nil(t.match.oid(nil))
   end)
   it("is", function()
     assert.oid('66909d26cbade70b6b022b9a')

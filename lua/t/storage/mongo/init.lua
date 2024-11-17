@@ -1,34 +1,27 @@
-local meta = require "meta"
-local t = t or require "t"
+local t=t or require "t"
+require "t.format.bson"
 local is = t.is ^ 'mongo'
-local pkg = t.pkg((...) or 't.storage.mongo')
-local bson = t.format.bson
-local cache = meta.cache
-local storage = cache('storage')
-cache.objnormalize.storage = t.pkg.name
-
-assert(bson)
-assert(pkg.type)
-assert(pkg.cursor)
-
-local connection = assert(pkg.connection)
-local client = assert(pkg.client)
+local to = t.to
+local pkg = t.pkg(...)
+local storage = pkg.cache
+local connection = pkg.connection
+local client = pkg.client
 
 return t.object({
   __name=tostring(pkg),
   __call=function(self, connstr) return setmetatable({connstr=connstr}, getmetatable(self)) end,
-  __pow=function(self, to) -- tie storage to container [loader or any indexable]
-    assert(type(to)=='table', ('t.storage.mongo:__pow await table, got %s'):format(type(to)))
-    storage[to]=self
+  __pow=function(self, x) -- tie storage to container [loader or any indexable]
+    assert(type(x)=='table', ('t.storage.mongo:__pow await table, got %s'):format(type(x)))
+    storage[x]=self
     return self
   end,
-  __toboolean=function(self) return toboolean((is.factory() and self() or self).client) end,
+  __toboolean=function(self) return to.boolean((is.factory(self) and self() or self)._client) end,
 }):computable({
-  conn=function(self) return assert(connection(rawget(self, 'connstr'))) end,
-  client=function(self) return assert(client(self.conn)) end,
-  dbname=function(self) return assert(self.conn.db) end,
-  db=function(self) return assert(self.client/self.dbname) end,
+  _conn=function(self) return connection(rawget(self, 'connstr')) end,
+  _client=function(self) return client(self._conn) end,
+  _dbname=function(self) return self._conn.db end,
+  _db=function(self) return assert(self._client/self._dbname) end,
 }):postindex(function(self, k)
   if is.factory(self) then return self()[k] end
-  return self.db[k]
+  return (self._db or {})[k]
 end):loader(tostring(pkg)):factory()
