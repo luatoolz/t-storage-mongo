@@ -25,6 +25,22 @@ describe("client", function()
     assert.truthy(mongo())
     assert.truthy(mongo.auth)
   end)
+  it("iter", function()
+    local n=0
+    for db in table.iter(mongo) do
+--      print(db)
+      n=n+1
+    end
+    assert.is_true(n>0)
+  end)
+  it("pairs", function()
+    local n=0
+    for k,v in pairs(mongo) do
+--      print('pairs',k,v)
+      n=n+1
+    end
+    assert.is_true(n>0)
+  end)
   it("command", function()
     local data = mongo.data
     _ = -data

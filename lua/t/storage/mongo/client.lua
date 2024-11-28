@@ -2,6 +2,7 @@ local t=t or require "t"
 local driver = require 'mongo'
 local pkg=t.pkg(...)
 local to=t.to
+local iter=table.iter
 
 local connection, database, collection =
   pkg.connection, pkg.database, pkg.collection
@@ -34,6 +35,7 @@ local function fix_client_meta(object)
   mt.__toboolean = mt.__toboolean or function(self) return to.boolean(assert(self:getDatabaseNames())) end
   mt.__div  = mt.__div or function(self, key) return database(self:getDatabase(key)) end
   mt.__call = mt.__call or function(self, dbname, collname) return collection(self:getCollection(dbname, collname)) end
+  mt.__iter = mt.__iter or function(self) return iter(self:getDatabaseNames()) end
 
   assert(type(mt.__call)=='function')
   assert(type(mt.__div)=='function')

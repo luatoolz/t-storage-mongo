@@ -33,6 +33,9 @@ return function(object)
     return getmetatable(self)[key] or collection(self:getCollection(key))
   end
   mt.__unm = mt.__unm or function(self) return ok(self:drop()) end
+  mt.__pairs = mt.__pairs or function(self)
+    return ipairs(self:getCollectionNames())
+  end
 
   assert(type(mt.__unm)=='function')
   assert(type(mt.__index)=='function')

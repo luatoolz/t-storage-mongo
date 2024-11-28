@@ -2,6 +2,7 @@ local t=t or require "t"
 require "t.format.bson"
 local is = t.is ^ 'mongo'
 local to = t.to
+local iter = table.iter
 local pkg = t.pkg(...)
 local storage = pkg.cache
 local connection = pkg.connection
@@ -16,6 +17,9 @@ return t.object({
     return self
   end,
   __toboolean=function(self) return to.boolean((is.factory(self) and self() or self)._client) end,
+  __div=function(self, dbname) return assert(self._client/dbname or self._dbname) end,
+  __iter=function(self) return iter(self._client) end,
+  __pairs=function(self) return pairs(self._db)  end,
 }):computable({
   _conn=function(self) return connection(rawget(self, 'connstr')) end,
   _client=function(self) return client(self._conn) end,
