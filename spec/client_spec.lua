@@ -25,22 +25,6 @@ describe("client", function()
     assert.truthy(mongo())
     assert.truthy(mongo.auth)
   end)
-  it("iter", function()
-    local n=0
-    for db in table.iter(mongo) do
---      print(db)
-      n=n+1
-    end
-    assert.is_true(n>0)
-  end)
-  it("pairs", function()
-    local n=0
-    for k,v in pairs(mongo) do
---      print('pairs',k,v)
-      n=n+1
-    end
-    assert.is_true(n>0)
-  end)
   it("command", function()
     local data = mongo.data
     _ = -data
@@ -57,5 +41,20 @@ describe("client", function()
     _ = -data
 -- https://www.mongodb.com/docs/manual/core/indexes/create-index/specify-index-name/
 -- https://www.mongodb.com/docs/manual/reference/command/createIndexes/#mongodb-dbcommand-dbcmd.createIndexes
+  end)
+  it("iter", function()
+    local n=0
+    for db in table.iter(mongo) do
+      n=n+1
+    end
+    assert.is_true(n>0)
+  end)
+  it("pairs", function()
+    assert.truthy(mongo.coll + {})
+    local n=0
+    for k,v in pairs(mongo) do
+      n=n+1
+    end
+    assert.is_true(n>0)
   end)
 end)
