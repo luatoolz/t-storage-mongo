@@ -78,10 +78,10 @@ return function(object)
   mt.__tostring = mt.__tostring or function(self) return self:getName() end
 
   mt.__newindex = mt.__newindex or function(self, q, it)
-    if type(q)=='nil' then return self + it end
+    if type(q)=='nil' and type(it)~='nil' then return self + it end
+    if type(it)=='nil' then return self:remove(ex(q)) end
+    if type(it)=='table' then return self:update(ex(q), ex(it), {upsert=true}) end
     if is.bulk(q) or not q then return end
-    if type(it)=='nil' then self:remove(ex(q)) end
-    if type(it)=='table' then self:update(ex(q), ex(it), {upsert=true}) end
   end
 
   assert(mt.__add)
