@@ -1,10 +1,22 @@
 local t=t or require "t"
-local is, ok = t.is, t.ok
 local pkg=t.pkg(...)
+local cursor, bulk, __unquery, export, is, ok, pak, unpak =
+  pkg.cursor,
+  pkg.bulk,
+  pkg.unquery,
+  t.exporter,
+  t.is, t.ok,
+  table.pack or pack,
+  table.unpack or unpack
 
-local cursor, bulk = pkg.cursor, pkg.bulk
-local export = t.exporter
-local ex=function(x) return export(x, true) end
+local function ex(x) return export(x, true) end
+local function unquery(q)
+  local r = pak(__unquery(q))
+  return ex(r[1]), ex(r[2])
+end
+local function is_single(o)
+  return type(o)=='table' and o.limit==1 and o.singleBatch
+end
 
 --[[
   [__gc] = function: 0x7f494660c8e0
@@ -42,13 +54,36 @@ return function(object)
   if type(mt.__index)=='nil' then
     mt.__index=mt.__index or function(self, key) if not (type(key)=='table' or (type(key)=='string' and #key>0)) then return nil end
       if type(key)=='string' then return getmetatable(self)[key] end
-      if type(key)=='table' and key._id then
-        local rv=self:findOne(ex(key))
-        if type(rv)=='userdata' then return rv:value() end
-        return ok(rv)
+      if type(key)=='table' then
+--[[
+        local options
+        if key.options then
+          options=key.options
+          key.options=nil
+        end
+        if key._id then
+          local rv=self:findOne(ex(key), options)
+          if type(rv)=='userdata' then return rv:value() end
+          return ok(rv)
+        end
+        return cursor(self:find(ex(key), options))
+--]]
+        local query, options = unquery(key)
+--        if as then return cursor(self:find(query, options)) end
+      if query then
+        if query._id or is_single(options) then
+          if type(options)=='table' then
+            options.limit=nil
+            options.singleBatch = nil
+            if type(next(options))=='nil' then options=nil end
+          end
+          local rv=self:findOne(query, options)
+          if type(rv)=='userdata' then return rv:value() end
+          return ok(rv)
+        end
+        return cursor(self:find(query, options))
       end
-      if type(key)=='table' then return cursor(self:find(ex(key))) end
-  end end
+      end end end
 
   mt.__div    = mt.__div or function(self, it) if type(it)~='boolean' then it=true end; return bulk(self:createBulkOperation{ordered=it}) end
   mt.__concat = mt.__concat or function(self, x) if type(x)=='nil' then return end
@@ -71,7 +106,16 @@ return function(object)
     if #it>0 then return ((self/true)-it)() end
   end
   mt.__mod    = mt.__mod or function(self, q) q=ex(q); q=is.table(q) and q or {}; return ok(self:count(q)) end
-  mt.__mul    = mt.__mul or function(self, q) q=ex(q); if is.table(q) then return cursor(self:find(q)) end end
+--  mt.__mul    = mt.__mul or function(self, q) q=ex(q); if is.table(q) then return cursor(self:find(q)) end end
+  mt.__mul    = mt.__mul or function(self, query)
+    local q, o = unquery(query)
+--    local rv
+--    if is.table(q) then
+    return q and cursor(self:find(q, o))
+--      rv=cursor(self:find(q, o))
+--      return rv and (as and iter(rv) or rv)
+--    end
+  end
 
   mt.__unm    = mt.__unm or function(self) return ok(self:drop()) end
   mt.__len    = mt.__len or function(self) return ok(self:count({})) end

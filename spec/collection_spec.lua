@@ -1,5 +1,5 @@
 describe("collection", function()
-  local t, mongo, coll, to, iter, map, array
+  local t, mongo, coll, to, iter, map, array, oid
   setup(function()
     t = require "t"
     t.env.MONGO_HOST='127.0.0.1'
@@ -12,7 +12,7 @@ describe("collection", function()
     _ = map
     mongo = t.storage.mongo
     coll = mongo.coll
-    oid=mongo.oid
+    oid = mongo.oid
   end)
   before_each(function()
     t.env.MONGO_CONNSTRING=nil
@@ -90,6 +90,46 @@ describe("collection", function()
       {role='traffer', token='46db395df332f18b437d572837d314e421804aaed0f229872ce7d8825d11ff9a'}})).nInserted)
     assert.equal(2, (coll .. {{role='root', token='95687c9a1a88dd2d552438573dd018748dfff0222c76f085515be2dc1db2afa7'},
       {role='traffer', token='46db395df332f18b437d572837d314e421804aaed0f229872ce7d8825d11ff9a'}}).nInserted)
+  end)
+  it("query limit", function()
+    local sub = table.sub
+    local id = t.array('66909d26cbade70b6b022d9a','66909d26cbade70b6b022d9b','66909d26cbade70b6b022d9c','66909d26cbade70b6b022d9d') * oid
+    local obj = id * function(v,k) return {_id=v,n=k} end
+    assert.equal(0, to.number(coll))
+    assert.equal(4, #obj)
+    assert.equal(id[3], obj[3]._id)
+    assert.equal(3, obj[3].n)
+    assert.equal(4, (coll + obj).nInserted)
+    assert.equal(4, to.number(coll))
+
+    local mid = mongo.oid('66909d26cbade70b6b022d9a')
+    assert.same({_id=tostring(mid), n=1}, coll[{_id=mid}])
+--    assert.same({_id=oid('66909d26cbade70b6b022d9a'), n=1}, coll[oid('66909d26cbade70b6b022d9a')])
+
+    local got = coll[{}]
+    assert.is_userdata(got)
+    assert.callable(got)
+    local c=0
+    while got() do c=c+1 end
+    assert.equal(4, c)
+
+    assert.same(sub(obj, 1, 1), map(coll*{query={},options={limit=1}}))
+    assert.same(sub(obj, 1, 2), map(coll*{query={},options={limit=2}}))
+    assert.same(sub(obj, 1, 3), map(coll*{query={},options={limit=3}}))
+    assert.same(sub(obj, 1, 4), map(coll*{query={},options={limit=4}}))
+    assert.same(sub(obj, 1, 4), map(coll*{query={},options={limit=5}}))
+
+    assert.same(sub(obj, 1, 1), map(coll[{query={},options={limit=1}}]))
+    assert.same(sub(obj, 1, 2), map(coll[{query={},options={limit=2}}]))
+    assert.same(sub(obj, 1, 3), map(coll[{query={},options={limit=3}}]))
+    assert.same(sub(obj, 1, 4), map(coll[{query={},options={limit=4}}]))
+    assert.same(sub(obj, 1, 4), map(coll[{query={},options={limit=5}}]))
+
+    assert.same(sub(obj, 1, 4), map(coll[{}]))
+    assert.same(obj, map(coll[{}]))
+
+    assert.is_true(-coll)
+    assert.equal(0, to.number(coll))
   end)
 --[[
   it("update", function()
