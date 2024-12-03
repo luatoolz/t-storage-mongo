@@ -1,18 +1,16 @@
 local t=t or require "t"
 local pkg=t.pkg(...)
-local cursor, bulk, __unquery, export, is, ok, pak, unpak =
+local cursor, bulk, __unquery, export, is, ok =
   pkg.cursor,
   pkg.bulk,
   pkg.unquery,
   t.exporter,
-  t.is, t.ok,
-  table.pack or pack,
-  table.unpack or unpack
+  t.is, t.ok
 
 local function ex(x) return export(x, true) end
 local function unquery(q)
-  local r = pak(__unquery(q))
-  return ex(r[1]), ex(r[2])
+  local a, b = __unquery(q)
+  return ex(a), ex(b)
 end
 local function is_single(o)
   return type(o)=='table' and o.limit==1 and o.singleBatch
@@ -55,21 +53,7 @@ return function(object)
     mt.__index=mt.__index or function(self, key) if not (type(key)=='table' or (type(key)=='string' and #key>0)) then return nil end
       if type(key)=='string' then return getmetatable(self)[key] end
       if type(key)=='table' then
---[[
-        local options
-        if key.options then
-          options=key.options
-          key.options=nil
-        end
-        if key._id then
-          local rv=self:findOne(ex(key), options)
-          if type(rv)=='userdata' then return rv:value() end
-          return ok(rv)
-        end
-        return cursor(self:find(ex(key), options))
---]]
-        local query, options = unquery(key)
---        if as then return cursor(self:find(query, options)) end
+      local query, options = unquery(key)
       if query then
         if query._id or is_single(options) then
           if type(options)=='table' then
@@ -106,15 +90,10 @@ return function(object)
     if #it>0 then return ((self/true)-it)() end
   end
   mt.__mod    = mt.__mod or function(self, q) q=ex(q); q=is.table(q) and q or {}; return ok(self:count(q)) end
---  mt.__mul    = mt.__mul or function(self, q) q=ex(q); if is.table(q) then return cursor(self:find(q)) end end
   mt.__mul    = mt.__mul or function(self, query)
     local q, o = unquery(query)
---    local rv
---    if is.table(q) then
+    pkg:assert(type(q)=='table', '__mul await table, got %s' % type(q))
     return q and cursor(self:find(q, o))
---      rv=cursor(self:find(q, o))
---      return rv and (as and iter(rv) or rv)
---    end
   end
 
   mt.__unm    = mt.__unm or function(self) return ok(self:drop()) end
