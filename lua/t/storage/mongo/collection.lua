@@ -1,4 +1,5 @@
 local t=t or require "t"
+local pkgn = ...
 local pkg=t.pkg(...)
 local cursor, bulk, __unquery, export, is, ok =
   pkg.cursor,
@@ -92,7 +93,7 @@ return function(object)
   mt.__mod    = mt.__mod or function(self, q) q=ex(q); q=is.table(q) and q or {}; return ok(self:count(q)) end
   mt.__mul    = mt.__mul or function(self, query)
     local q, o = unquery(query)
-    pkg:assert(type(q)=='table', '__mul await table, got %s' % type(q))
+    pkgn:assert(type(q)=='table', '__mul await table, got %s' % type(q))
     return q and cursor(self:find(q, o))
   end
 
