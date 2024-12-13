@@ -64,7 +64,7 @@ local function parse_connstring(oconnstring)
   }
 end
 
-return t.object({
+return t.factory({},{
   __name='connection',
   __tostring=function(self) return (is.factory(self) and self() or self).connstring or '' end,
   __call=function(self, conn)
@@ -72,7 +72,7 @@ return t.object({
     if type(conn)~='table' then conn={} end
     return getmetatable(conn)==getmetatable(self) and conn or setmetatable(conn, getmetatable(self))
   end,
-}):computable({
+  __computable={
   prefix  = function(self) return env.MONGO_PREFIX end,
   db      = function(self) if next(self)==nil then return env.MONGO_DB end end,
   hosts   = function(self) return env.MONGO_HOST:match('[,]') and env.MONGO_HOST:split(',') or nil end,
@@ -92,4 +92,5 @@ return t.object({
     local hostopts = join('?', hostdb, options)
     return join('', self.prefix, hostopts)
   end,
-}):factory()
+  },
+})
