@@ -22,8 +22,8 @@ describe("connection", function()
     assert.not_nil(mongo)
     assert.equal(is, is2)
 
-    assert.is_true(is.factory(mongo))
-    assert.truthy(is.factory(t.storage.mongo))
+    assert.truthy(is.instance(mongo))
+    assert.truthy(is.instance(t.storage.mongo))
 
     assert.equal(mongo2, mongo)
     assert.equal(mongo2, mongo3)
