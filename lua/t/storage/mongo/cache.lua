@@ -1,10 +1,10 @@
 local t=t or require "t"
-local cache=t.cache
+local mcache=t.mcache
 local match=t.match
 local tpkgname=t.pkg.name
 
 -- storage[t.def]=t.storage.mongo
-return cache.storage/{
+return mcache.storage/{
 put=function(self, k, v) self[tpkgname(k)]=v end,
 get=function(self, o)
   if type(o)=='string' then return self[o] end

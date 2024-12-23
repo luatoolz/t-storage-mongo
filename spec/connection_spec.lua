@@ -8,7 +8,7 @@ describe("connection", function()
     is2 = require "t/is"
     meta = require "meta"
     mt = meta.mt
-    cache = meta.cache
+    mcache = meta.mcache
     mongo = t.storage.mongo
     mongo2 = require "t.storage.mongo"
     mongo3 = require "t/storage/mongo"
@@ -33,10 +33,10 @@ describe("connection", function()
     assert.equal('storage/mongo', t.type(mongo2))
     assert.equal('storage/mongo', t.type(mongo3))
 
-    assert.equal('storage/mongo', cache.type[mongo])
-    assert.equal('storage/mongo', cache.type[mongo2])
-    assert.equal('storage/mongo', cache.type[mt(mongo2)])
-    assert.equal('storage/mongo', cache.type[cache.instance[mongo3]])
+    assert.equal('storage/mongo', mcache.type[mongo])
+    assert.equal('storage/mongo', mcache.type[mongo2])
+    assert.equal('storage/mongo', mcache.type[mt(mongo2)])
+    assert.equal('storage/mongo', mcache.type[mcache.instance[mongo3]])
 
     assert.equal('storage/mongo/connection', t.type(connection1))
     assert.equal('storage/mongo/connection', t.type(connection2))
@@ -45,8 +45,8 @@ describe("connection", function()
     assert.is_nil(mongo.connection.noneexistent)
   end)
   it("has loader", function()
-    assert.is_table(cache.loader[mongo])
-    assert.is_table(cache.loader[getmetatable(mongo)])
+    assert.is_table(mcache.loader[mongo])
+    assert.is_table(mcache.loader[getmetatable(mongo)])
   end)
   it("connstring", function()
     assert.equal('mongodb://mongodb:27017/db', tostring(mongo.connection))
