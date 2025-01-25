@@ -1,12 +1,12 @@
 local t=t or require "t"
 local pkgn = ...
 local pkg=t.pkg(...)
-local cursor, bulk, __unquery, export, is, ok =
+local cursor, bulk, __unquery, export, is, ok, iter =
   pkg.cursor,
   pkg.bulk,
   pkg.unquery,
   t.exporter,
-  t.is, t.ok
+  t.is, t.ok, table.iter
 
 local function ex(x) return export(x, true) end
 local function unquery(q)
@@ -16,6 +16,7 @@ end
 local function is_single(o)
   return type(o)=='table' and o.limit==1 and o.singleBatch
 end
+local bulkresult = pkg.bulkresult
 
 --[[
   [__gc] = function: 0x7f494660c8e0
@@ -70,20 +71,27 @@ return function(object)
       end
       end end end
 
+  mt.upsert=mt.upsert or function(self, x) if not x then return end
+    local q, it = (type(x)=='table' and (getmetatable(x) or {}).__div) and ex(x/true) or nil, ex(x)
+    if it then if q then return ok(self:update(q, it, {upsert=true})) else return ok(self:insert(it, {continueOnError=true})) end end
+    return nil
+  end
+
   mt.__div    = mt.__div or function(self, it) if type(it)~='boolean' then it=true end; return bulk(self:createBulkOperation{ordered=it}) end
   mt.__concat = mt.__concat or function(self, x) if type(x)=='nil' then return end
-    local it=ex(x)
-    if type(it)~='table' then return end
-
-    if not is.bulk(it) then return ok(self:insert(it), {continueOnError=true}) end
-    if #it>0 then return ((self/true)..it)() end
+    if not is.bulk(x) then return self:upsert(x) end
+    if #x==0 then return end
+    local r = {nInserted=0,nMatched=0,nModified=0,nRemoved=0,nUpserted=0} -- 'writeErrors'
+    local y,e
+    for v in iter(x) do y,e=self:upsert(ex(v))
+      if y then r.nUpserted=r.nUpserted+1 else
+        r.writeErrors=r.writeErrors or {}
+        table.insert(r.writeErrors, e)
+      end
+    end
+    return bulkresult(r)
   end
-  mt.__add    = mt.__add or function(self, x) if type(x)=='nil' then return end
-    local it=ex(x)
-    if type(it)~='table' then return end
-    if not is.bulk(it) then return ok(self:insert(it), {continueOnError=true}) end
-    if #it>0 then return ((self/true)..it)() end
-  end
+  mt.__add = mt.__add or mt.__concat
   mt.__sub    = mt.__sub or function(self, x) if type(x)=='nil' then return end
     local it=ex(x)
     if type(it)~='table' then return end

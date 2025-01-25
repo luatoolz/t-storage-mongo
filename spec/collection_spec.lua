@@ -66,7 +66,8 @@ describe("collection", function()
     assert.equal(0, to.number(coll))
 
     id={oid(),oid()}
-    assert.equal(2, (coll .. {{_id=id[1],name='some', try=2}, {_id=id[2],name='some', try=3}}).nInserted)
+    local r = (coll .. {{_id=id[1],name='some', try=2}, {_id=id[2],name='some', try=3}})
+    assert.equal(2, r.nInserted + r.nUpserted)
     assert.equal(2, to.number(coll))
 
     assert.equal('some', coll[{_id=id[1]}].name)
@@ -86,10 +87,12 @@ describe("collection", function()
     end
   end)
   it("array of objects", function()
-    assert.equal(2, (coll .. array({{role='root', token='95687c9a1a88dd2d552438573dd018748dfff0222c76f085515be2dc1db2afa7'},
-      {role='traffer', token='46db395df332f18b437d572837d314e421804aaed0f229872ce7d8825d11ff9a'}})).nInserted)
-    assert.equal(2, (coll .. {{role='root', token='95687c9a1a88dd2d552438573dd018748dfff0222c76f085515be2dc1db2afa7'},
-      {role='traffer', token='46db395df332f18b437d572837d314e421804aaed0f229872ce7d8825d11ff9a'}}).nInserted)
+    local r = (coll .. array({{role='root', token='95687c9a1a88dd2d552438573dd018748dfff0222c76f085515be2dc1db2afa7'},
+      {role='traffer', token='46db395df332f18b437d572837d314e421804aaed0f229872ce7d8825d11ff9a'}}))
+    assert.equal(2, r.nInserted+r.nUpserted)
+    r = (coll .. {{role='root', token='95687c9a1a88dd2d552438573dd018748dfff0222c76f085515be2dc1db2afa7'},
+      {role='traffer', token='46db395df332f18b437d572837d314e421804aaed0f229872ce7d8825d11ff9a'}})
+    assert.equal(2, r.nInserted+r.nUpserted)
   end)
   it("query limit", function()
     local sub = table.sub
@@ -99,7 +102,8 @@ describe("collection", function()
     assert.equal(4, #obj)
     assert.equal(id[3], obj[3]._id)
     assert.equal(3, obj[3].n)
-    assert.equal(4, (coll + obj).nInserted)
+    local sum = (coll + obj)
+    assert.equal(4, sum.nInserted+sum.nUpserted)
     assert.equal(4, to.number(coll))
 
     local mid = mongo.oid('66909d26cbade70b6b022d9a')

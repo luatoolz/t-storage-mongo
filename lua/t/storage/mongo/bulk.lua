@@ -18,25 +18,14 @@ return function(object)
         return getmetatable(self)[key] end end end
 
   mt.__concat = mt.__concat or function(self, it)
-    it=ex(it)
-    if is.bulk(it) then
-      for v in iter(it) do
-        self:insert(v) end
-    else self:insert(it) end
+    if not is.bulk(it) then it={it} end
+    for v in iter(it) do self:insert(ex(v)) end
     return self
   end
-  mt.__add    = mt.__add or function(self, it) it=ex(it)
-    if is.bulk(it) then
-      for v in iter(it) do
-        self:insert(v) end
-    else self:insert(it) end
-    return self
-  end
-  mt.__sub    = mt.__sub or function(self, it) it=ex(it)
-    if is.bulk(it) then
-      for v in iter(it) do
-        self:removeOne(v) end
-    else self:removeOne(it) end
+  mt.__add    = mt.__add or mt.__concat
+  mt.__sub    = mt.__sub or function(self, it)
+    if not is.bulk(it) then it={it} end
+    for v in iter(it) do self:removeOne(ex(v)) end
     return self
   end
   mt.__call     = mt.__call or function(self, ...) return bulkresult(ok(self:execute(...))) end
